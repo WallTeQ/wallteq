@@ -1,8 +1,6 @@
 import { CloudDownload } from "lucide-react";
 import foto from "../assets/images/business-team.png"
 import FeatureCards from "../components/Cards";
-import ContactSection from "../components/ContactSection";
-import CTA from "../components/Cta";
 import MissionVision from "../components/Mission";
 export default function AboutPage() {
   return (
@@ -83,7 +81,7 @@ export default function AboutPage() {
             <a
               href="../assets/WallTeQ-Profile.pdf" // Path to your PDF file
               download="WallTeQ-Profile.pdf" // Name of the downloaded file
-              className="px-6 py-3 bg-gradient-to-r from-[#1a2e4c] to-blue-800 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="w-full md:w-auto bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group flex items-center justify-center gap-3"
             >
               <CloudDownload className="w-5 h-5" />{" "}
               {/* Adjust icon size as needed */}
@@ -94,21 +92,7 @@ export default function AboutPage() {
       </div>
       <FeatureCards />
       <MissionVision />
-      {/* <div width="100%" className="container mx-auto py-8">
-        <iframe
-          width="100%"
-          height="600"
-          frameBorder="0"
-          scrolling="no"
-          marginHeight="0"
-          marginWidth="0"
-          src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=Cheeseman%20Avenue,%20Airfield%20Sinkor%20Monrovia%201000,%20Liberia%2010%20GPS:+(WallTeq%20Company)&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
-        >
-          <a href="https://www.gps.ie/collections/drones/">drones ireland</a>
-        </iframe>
-      </div> */}
-      {/* <CTA /> */}
-      {/* <ContactSection /> */}
+      
     </div>
   );
 }

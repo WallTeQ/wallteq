@@ -1,15 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
-import { motion, useAnimation, useInView } from "framer-motion";
-import { ArrowRight, ChevronRight } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import ContactForm from "./forms/ContactForm";
+import { useEffect, useRef } from "react";
+import img from "../assets/img1.webp";
+import { Link } from "react-router-dom";
 
-const ParticleBackground = () => {
+const Hero = () => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -18,72 +17,43 @@ const ParticleBackground = () => {
 
     const particles = [];
 
-    for (let i = 0; i < 100; i++) {
+    // Create particles
+    for (let i = 0; i < 80; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        dx: (Math.random() - 0.5) * 0.3,
-        dy: (Math.random() - 0.5) * 0.3,
-        size: Math.random() * 1.5,
-        connection: [],
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        size: Math.random() * 1.5 + 0.5,
+        opacity: Math.random() * 0.6 + 0.2,
       });
     }
 
-    function drawConnections(particle, index) {
-      if (!ctx) return;
-      particles.forEach((p, i) => {
-        if (index === i) return;
-        const distance = Math.hypot(particle.x - p.x, particle.y - p.y);
-        if (distance < 100) {
-          ctx.beginPath();
-          ctx.strokeStyle = `rgba(59, 130, 246, ${
-            0.15 * (1 - distance / 100)
-          })`;
-          ctx.lineWidth = 0.5;
-          ctx.moveTo(particle.x, p.y);
-          ctx.lineTo(p.x, p.y);
-          ctx.stroke();
-        }
-      });
-    }
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    let lastFrameTime = 0;
-    const fps = 30; // Target frames per second
-    const frameDuration = 1000 / fps;
+      particles.forEach((particle) => {
+        // Update position
+        particle.x += particle.vx;
+        particle.y += particle.vy;
 
-    function animate(currentTime) {
-      if (!ctx) return;
-      const deltaTime = currentTime - lastFrameTime;
-      if (deltaTime < frameDuration) {
-        requestAnimationFrame(animate);
-        return;
-      }
-      lastFrameTime = currentTime;
+        // Wrap around edges
+        if (particle.x < 0) particle.x = canvas.width;
+        if (particle.x > canvas.width) particle.x = 0;
+        if (particle.y < 0) particle.y = canvas.height;
+        if (particle.y > canvas.height) particle.y = 0;
 
-      if (canvas) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-      particles.forEach((particle, index) => {
-        particle.x += particle.dx;
-        particle.y += particle.dy;
-
-        if (canvas && (particle.x < 0 || particle.x > canvas.width))
-          particle.dx *= -1;
-        if (canvas && (particle.y < 0 || particle.y > canvas.height))
-          particle.dy *= -1;
-
+        // Draw particle
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(59, 130, 246, 0.2)";
+        ctx.fillStyle = `rgba(148, 163, 184, ${particle.opacity})`;
         ctx.fill();
-
-        drawConnections(particle, index);
       });
 
       requestAnimationFrame(animate);
-    }
+    };
 
-    requestAnimationFrame(animate);
+    animate();
 
     const handleResize = () => {
       canvas.width = window.innerWidth;
@@ -91,193 +61,101 @@ const ParticleBackground = () => {
     };
 
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
-  return <canvas ref={canvasRef} className="absolute inset-0" />;
-};
-
-const Hero = () => {
-  const controls = useAnimation();
-  const ref = useRef(null);
-  const isInView = useInView(ref);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isContactFormOpen, setIsContactFormOpen] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isInView) {
-      controls.start("visible");
-    }
-  }, [controls, isInView]);
-
-  const handleMouseMove = (e) => {
-    setMousePosition({
-      x: (e.clientX - window.innerWidth / 2) * 0.005,
-      y: (e.clientY - window.innerHeight / 2) * 0.005,
-    });
-  };
-
-  const handleCloseForm = () => {
-    setIsContactFormOpen(false);
-  };
-
   return (
-    <div
-      className="w-full min-h-[75vh] bg-slate-900 text-white relative overflow-hidden"
-      onMouseMove={handleMouseMove}
+    <section
+      id="home"
+      className="relative min-h-screen overflow-hidden"
+      style={{
+        backgroundImage: `url(${img})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
     >
-      <ParticleBackground />
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/80 to-slate-900/95" />
-      <main
-        className="relative flex items-center justify-center w-full min-h-[75vh] py-16"
-        ref={ref}
-      >
-        <div
-          className="relative max-w-7xl mx-auto px-4 sm:px-2 lg:px-4 py-8 sm:py-12 lg:py-16 flex flex-col items-center justify-center text-center"
-          style={{
-            transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
-            transition: "transform 0.1s ease-out",
-          }}
-        >
-          <motion.div
-            initial="hidden"
-            animate={controls}
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            className="mb-4"
-          >
-            <motion.div
-              className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 px-4 py-2 rounded-full text-sm font-medium"
-              whileHover={{ scale: 1.05 }}
-            >
-              WALLTEQ <ChevronRight className="w-4 h-4" />
-            </motion.div>
-          </motion.div>
+      {/* Dark overlay to maintain readability */}
+      <div className="absolute inset-0 bg-black/70"></div>
 
-          <motion.div
-            initial="hidden"
-            animate={controls}
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-          >
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
-              <motion.span
-                className="bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 bg-clip-text text-transparent"
-                style={{ backgroundSize: "200% 200%" }}
-                animate={{
-                  backgroundPosition: ["0% 50%", "100% 50%"],
-                }}
-                transition={{
-                  duration: 5,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              >
-                Innovation Through
-              </motion.span>{" "}
-              <span className="relative">
-                {" "}
-                <br />
-                Digital Excellence
-                <motion.div
-                  className="absolute -bottom-2 left-0 w-full h-1 bg-blue-500/30 rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 1, delay: 0.5 }}
-                />
+      {/* Animated Background */}
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-gray-900/30 to-black/50"></div>
+
+      {/* Content */}
+      <div className="relative z-10 pt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="max-w-4xl">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 bg-blue-500/10 backdrop-blur-sm border border-blue-500/20 rounded-full px-4 py-2 mb-8 hero-badge">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              <span className="text-blue-400 font-medium text-sm">
+                100+ Businesses Thriving
+              </span>
+            </div>
+
+            {/* Main Headline */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight hero-title">
+              Turning Ideas into
+              <span className=" text-blue-400 block hero-highlight">
+                Powerful Web & Mobile Experiences
               </span>
             </h1>
-          </motion.div>
 
-          <motion.p
-            initial="hidden"
-            animate={controls}
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg sm:text-xl lg:text-2xl text-gray-300 mb-8 sm:mb-12 lg:mb-16"
-          >
-            Revolutionizing business landscapes through cutting-edge technology
-            solutions. <br /> We transform challenges into opportunities for
-            digital growth.
-          </motion.p>
+            {/* Subtitle */}
+            <p className="text-lg text-slate-300 mb-8 max-w-2xl leading-relaxed hero-subtitle">
+              We build digital products that meet your market&#39;s most authentic
+              needs, engineered for growth, and ready for the future. Our goal
+              is simple: turn your vision into an experience users will love.
+            </p>
 
-          <motion.div
-            initial="hidden"
-            animate={controls}
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-row items-center justify-center gap-4 w-full max-w-md mx-auto"
-          >
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex-1 group relative flex items-center justify-center gap-2 bg-gradient-to-r from-[#1a2e4c] to-blue-800  text-white px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 rounded-lg text-lg font-semibold overflow-hidden whitespace-nowrap"
-              onClick={() => setIsContactFormOpen(true)}
-            >
-              <Link to="/contact-us" className="relative">
-                Get Started
-              </Link>
-              <motion.div
-                animate={{
-                  x: [0, 5, 0],
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                <ArrowRight className="w-6 h-6" />
-              </motion.div>
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex-1 px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 text-lg font-semibold text-gray-300 hover:text-white transition-colors border-2 border-blue-800 shadow-[0_0_10px_rgba(59,130,246,0.5)] hover:border-blue-500 hover:shadow-[0_0_10px_rgba(59,130,246,0.5)] whitespace-nowrap"
-            >
-              <Link to="/about">Learn More</Link>
-            </motion.button>
-          </motion.div>
+            {/* CTA Buttons - Responsive Layout */}
+            <div className="mb-16 hero-cta">
+              
+              <div className="flex flex-col gap-4 sm:hidden">
+                <Link
+                  to="/contact"
+                  className="w-full bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group flex items-center justify-center gap-3"
+                >
+                  <span className="text-base">Get in Touch</span>
+                </Link>
+                <Link
+                  to="/templates"
+                  className="w-full bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group flex items-center justify-center gap-3"
+                >
+                  <span className="text-base">Select Template</span>
+                </Link>
+              </div>
+
+              
+              <div className="hidden sm:flex items-center gap-4">
+                <Link
+                  to="/contact"
+                  className="inline-flex bg-blue-800 items-center gap-3 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group"
+                >
+                  <span className="text-sm md:text-base whitespace-nowrap">
+                    Get in Touch
+                  </span>
+                </Link>
+                <Link
+                  to="/templates"
+                  className="inline-flex bg-blue-800 items-center gap-3 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group"
+                >
+                  <span className="text-sm md:text-base whitespace-nowrap">
+                    Select Template
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
-
-      {isContactFormOpen && (
-        <motion.div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={handleCloseForm}
-        >
-          <motion.div
-            className="bg-white rounded-lg p-8 max-w-lg w-full relative"
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.8 }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="absolute top-4 right-4 text-red-500 hover:text-red-700 text-2xl"
-              onClick={handleCloseForm}
-            >
-              &times;
-            </button>
-            <ContactForm />
-          </motion.div>
-        </motion.div>
-      )}
-    </div>
+      </div>
+    </section>
   );
 };
 

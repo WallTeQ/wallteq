@@ -1,11 +1,10 @@
-/* eslint-disable react/no-unescaped-entities */
-import React, { useState, useRef, useEffect } from "react";
+
+import { useState, useRef, useEffect } from "react";
 // import emailjs from '@emailjs/browser';
 import {
   MapPin,
   Clock,
   Mail,
-  Phone,
   Send,
   Building,
   Users,
@@ -63,27 +62,7 @@ export default function Contact() {
     });
   };
   
-  const contactInfo = [
-    {
-      icon: <Mail className="w-6 h-6" />,
-      title: "Email Us",
-      description: "Get in touch via email",
-      action: "info@company.com",
-    },
-    {
-      icon: <Phone className="w-6 h-6" />,
-      title: "Call Us",
-      description: "Mon-Fri from 8am to 5pm",
-      action: "+1 (555) 000-0000",
-    },
-    {
-      icon: <Clock className="w-6 h-6" />,
-      title: "Working Hours",
-      description: "We're available",
-      action: "24/7 Support Available",
-    },
-  ];
-  
+
 
   return (
     <section className="py-20 bg-white">
@@ -168,10 +147,10 @@ export default function Contact() {
                     wallteqinc@gmail.com
                   </a>
                   <a
-                    href="mailto:wallteq@wallteqonline.com"
+                    href="mailto:wallteq@gmail.com"
                     className="text-blue-400 hover:text-blue-700 block"
                   >
-                    wallteq@wallteqonline.com
+                    wallteq@gmail.com
                   </a>
                 </div>
               </div>
@@ -301,7 +280,13 @@ export default function Contact() {
                 </div>
 
                 {status.message && (
-                  <div className={`p-3 rounded-lg ${status.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
+                  <div
+                    className={`p-3 rounded-lg ${
+                      status.success
+                        ? "bg-green-50 text-green-700"
+                        : "bg-red-50 text-red-700"
+                    }`}
+                  >
                     {status.message}
                   </div>
                 )}
@@ -311,7 +296,7 @@ export default function Contact() {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-[#1a2e4c] to-blue-800 hover:bg-blue-600 text-white font-semibold py-4 px-8 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2 disabled:opacity-70"
+                  className="w-full md:w-auto bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group flex items-center justify-center gap-3"
                 >
                   {loading ? "Sending..." : "Send Message"}
                   {!loading && <Send className="w-5 h-5" />}

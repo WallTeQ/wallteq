@@ -165,7 +165,7 @@ const EquipmentMaintenance = () => {
                         </p>
                         <Link
                             to="/contact"
-                            className="inline-block bg-gradient-to-r from-[#1a2e4c] to-blue-800 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-300"
+                        className="inline-block bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group flex items-center justify-center gap-3"
                         >
                             Get Started
                         </Link>

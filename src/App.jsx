@@ -16,6 +16,7 @@ import {
   WebsiteDevelopment,
   NetworkCabling,
   MobileSoftwareDevelopment,
+  TemplatesPage
 } from "./pages";
 // import Services from './components/Services';
 import ContactSection from './components/ContactSection';
@@ -49,6 +50,7 @@ function App() {
         {/* <Route path="/contact" element={<ContactSection />} /> */}
         <Route path="/why-us" element={<WhyUs />} />
         <Route path="/services" element={<Services />} />
+        <Route path="/templates" element={<TemplatesPage />} />
         <Route path="/services/hardware-installation" element={<HardwareInstallation />} />
         <Route path="/services/network-surveillance" element={<NetworkSurveillance />} />
         <Route path="/services/equipment-maintenance" element={<EquipmentMaintenance />} />

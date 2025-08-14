@@ -55,7 +55,7 @@ const Services = () => {
     };
 
     return (
-        <section className="w-full bg-gray-50 -py-4 md:py-12">
+        <section className="w-full bg-gray-50 mt-12">
             <div className="w-full max-w-7xl mx-auto px-4 md:px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -114,7 +114,7 @@ const Services = () => {
                     ))}
                 </motion.div>
 
-                <div className="text-center mt-12 md:mt-16">
+                <div className="text-center my-4">
                     <Link
                         to="/services"
                         className="inline-flex items-center text-[#3B82F6] hover:text-blue-700 font-medium text-lg transition-colors duration-300"

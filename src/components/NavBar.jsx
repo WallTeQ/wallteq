@@ -17,7 +17,8 @@ const NavBar = () => {
   }, []);
 
   const navLinks = [
-    { name: "Home", link: "/", subItems: [] },
+    { name: "Templates", link: "/templates", subItems: [] },
+
     {
       name: "Company",
       link: "/about",

@@ -8,7 +8,7 @@ const ContactSection = () => {
 
     return (
         <div
-            className="relative w-full overflow-hidden md:mt-10 mt-4 mb-12 min-h-[600px]"
+            className="relative w-full overflow-hidden md:mt-10 mt-4  min-h-[600px]"
             style={{
                 backgroundImage: `url(${backGroundImg})`,
                 backgroundSize: 'cover',
@@ -43,11 +43,8 @@ const ContactSection = () => {
 
                 <Link to="/contact-us"
                     // onClick={handleButtonClick}
-                    className="px-6 py-3 bg-gradient-to-r from-[#1a2e4c] to-blue-800 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    className="inline-block bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group flex items-center justify-center gap-3"
 
-                    // className="flex-1 group relative flex items-center justify-center gap-2 bg-[#1a2e4c] rounded-full text-white px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 rounded-lg text-lg font-semibold overflow-hidden whitespace-nowrap"
-
-                    // className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-8 rounded-md text-base shadow-md transition duration-200"
                 >
                     Contact us Now
                 </Link>

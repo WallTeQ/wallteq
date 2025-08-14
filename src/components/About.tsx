@@ -23,7 +23,7 @@ const About = () => {
     };
 
     return (
-        <section className="relative w-full pt-16 pb-24 md:pb-48 lg:pb-64 overflow-hidden">
+        <section className="relative w-full pt-16 overflow-hidden">
             <main className="relative z-10 w-full px-2 md:px-6 max-w-7xl mx-auto">
                 {/* Top Section */}
                 <motion.div
@@ -37,8 +37,8 @@ const About = () => {
                         <p className="text-[#3B82F6] font-medium text-lg uppercase tracking-wide">
                             About WALLTEQ
                         </p>
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl mt-5 font-bold leading-snug">
-                            WallTeQ is your trusted source in IT services and support
+                        <h1 className="text-xl md:text-3xl lg:text-5xl mt-5 font-bold leading-snug">
+                            WallTeQ is your trusted source in software development services and support
                         </h1>
                     </motion.div>
                     <motion.div className="lg:w-1/2" variants={itemVariants}>
@@ -115,18 +115,7 @@ const About = () => {
                 </motion.div>
             </main>
 
-            {/* Footer Section */}
-            <div className="-mt-2 text-center bg-gray-50 py-12 md:py-16">
-                <p className="text-gray-800 font-bold text-xl md:text-3xl mb-4 px-4 lg:text-3xl">
-                    WallTeQ is your trusted source in ICT services and support.
-                </p>
-                <Link
-                    to={"/about"}
-                    className="text-[#3B82F6] hover:underline font-medium text-base md:text-lg"
-                >
-                    Explore WallTeQ
-                </Link>
-            </div>
+            
         </section>
     );
 };

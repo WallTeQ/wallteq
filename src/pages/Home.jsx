@@ -1,19 +1,20 @@
-import React from 'react'
+
 import About from '../components/About';
 import Services from '../components/Services';
-import ValuesSection from '../components/ValuesSection';
-import ContactSection from '../components/ContactSection';
 import Hero from '../components/Hero';
+import TemplateShowcase from '../components/TemplateShowcase';
 import TrustedBy from '../components/TrustedBy';
+import ServiceType from '../components/ServiceType';
 function Home() {
   return (
     <div>
-       <Hero /> 
+      <Hero />
+      <TrustedBy />
       <About />
       <Services />
-      <TrustedBy />
-      <ValuesSection />
-      {/* <ContactSection /> */}
+      <ServiceType />
+      <TemplateShowcase />
+     
     </div>
   );
 }

@@ -1,12 +1,4 @@
-import React from "react";
-import {
-  ArrowRight,
-  Package,
-  Award,
-  Clock,
-  Lightbulb,
-  TrendingUp,
-} from "lucide-react";
+
 import img1 from "../assets/images/img1.jpg";
 import img2 from "../assets/images/img3.jpg";
 import { Link } from "react-router-dom";
@@ -53,11 +45,9 @@ export default function WhyUs() {
             {/* CTA Button */}
             <Link
               to="/contact-us"
-              className="flex-1 group relative flex items-center justify-center gap-2 bg-gradient-to-r from-[#1a2e4c] to-blue-800 text-white px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 rounded-full text-lg font-semibold overflow-hidden whitespace-nowrap"
-              //   className="group inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-4 px-8 rounded-lg text-lg transition-all duration-300 transform hover:translate-x-1"
+              className="w-full md:w-auto bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group flex items-center justify-center gap-3"
             >
-              Try it yourself
-              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+              Get in touch
             </Link>
 
             {/* Stats Section */}

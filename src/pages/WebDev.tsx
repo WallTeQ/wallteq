@@ -142,9 +142,9 @@ const WebsiteDevelopment = () => {
                         </p>
                         <Link
                             to="/contact"
-                            className="inline-block bg-gradient-to-r from-[#1a2e4c] to-blue-800 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors duration-300"
+                            className="inline-block bg-white text-blue-800 px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300"
                         >
-                            Get Started
+                            See Our Available Templates
                         </Link>
                     </motion.div>
                 </motion.div>
