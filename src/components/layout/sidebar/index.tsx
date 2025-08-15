@@ -52,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white animate duration-500"
             >
-                <span className="ml-3 text-lg">CHRONICLE CMS</span>
+                <span className="ml-3 text-lg">WallTeQ CMS</span>
             </a>
             </div>
 
