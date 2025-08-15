@@ -18,12 +18,14 @@ import MobileSoftwareDevelopment from "../pages/MobileSoftwareDev";
 import Contact from "../pages/Contact";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
+import AuthPage from "../pages/auth/Auth";
 import ContactSection from "../components/ContactSection";
 const PublicRoutes: React.FC = () => (
   <>
     <NavBar />
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/auth" element={<AuthPage />} />
       <Route path="/company-profile" element={<CompanyProfile />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/values" element={<ValuesSection />} />

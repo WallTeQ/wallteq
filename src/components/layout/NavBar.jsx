@@ -160,6 +160,13 @@ const NavBar = () => {
                 )}
               </div>
             ))}
+            {/* login button */}
+            <Link
+              to="/auth"
+              className="inline-flex bg-blue-800 items-center gap-3 text-white px-5 py-1 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group "
+            >
+              <span>Login</span>
+            </Link>
           </nav>
 
           {/* Mobile Menu Button */}
