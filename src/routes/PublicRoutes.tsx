@@ -11,7 +11,7 @@ import HardwareInstallation from "../pages/HardwareInstall";
 import NetworkSurveillance from "../pages/NetworkSurveillance";
 import EquipmentMaintenance from "../pages/EquipmentMaintenance";
 import ITDeployment from "../pages/ItDeployments";
-import ITUpgrades from "../pages/ITUpgrade";
+import ITUpgrades from "../pages/ItUpgrades";
 import WebsiteDevelopment from "../pages/WebDev";
 import NetworkCabling from "../pages/NetworkCabling";
 import MobileSoftwareDevelopment from "../pages/MobileSoftwareDev";
