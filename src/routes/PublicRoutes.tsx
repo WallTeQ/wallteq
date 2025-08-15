@@ -10,7 +10,7 @@ import TemplatesPage from "../pages/Template";
 import HardwareInstallation from "../pages/HardwareInstall";
 import NetworkSurveillance from "../pages/NetworkSurveillance";
 import EquipmentMaintenance from "../pages/EquipmentMaintenance";
-import ITDeployment from "../pages/ITDeployment";
+import ITDeployment from "../pages/ItDeployments";
 import ITUpgrades from "../pages/ITUpgrade";
 import WebsiteDevelopment from "../pages/WebDev";
 import NetworkCabling from "../pages/NetworkCabling";
@@ -18,7 +18,7 @@ import MobileSoftwareDevelopment from "../pages/MobileSoftwareDev";
 import Contact from "../pages/Contact";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
-
+import ContactSection from "../components/ContactSection";
 const PublicRoutes: React.FC = () => (
   <>
     <NavBar />
