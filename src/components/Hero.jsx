@@ -70,7 +70,7 @@ const Hero = () => {
   return (
     <section
       id="home"
-      className="relative min-h-screen overflow-hidden"
+      className="relative overflow-hidden"
       style={{
         backgroundImage: `url(${img})`,
         backgroundSize: "cover",
@@ -89,7 +89,7 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 pt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="container mx-auto px-4">
           <div className="max-w-4xl">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-blue-500/10 backdrop-blur-sm border border-blue-500/20 rounded-full px-4 py-2 mb-8 hero-badge">
@@ -108,18 +108,18 @@ const Hero = () => {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-lg text-slate-300 mb-8 max-w-2xl leading-relaxed hero-subtitle">
-              We build digital products that meet your market&#39;s most authentic
-              needs, engineered for growth, and ready for the future. Our goal
-              is simple: turn your vision into an experience users will love.
+            <p className="text-sm text-slate-300 mb-8 max-w-2xl leading-relaxed hero-subtitle">
+              We build digital products that meet your market&#39;s most
+              authentic needs, engineered for growth, and ready for the future.
+              Our goal is simple: turn your vision into an experience users will
+              love.
             </p>
 
             {/* CTA Buttons - Responsive Layout */}
             <div className="mb-16 hero-cta">
-              
               <div className="flex flex-col gap-4 sm:hidden">
                 <Link
-                  to="/contact"
+                  to="/contact-us"
                   className="w-full bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group flex items-center justify-center gap-3"
                 >
                   <span className="text-base">Get in Touch</span>
@@ -132,7 +132,6 @@ const Hero = () => {
                 </Link>
               </div>
 
-              
               <div className="hidden sm:flex items-center gap-4">
                 <Link
                   to="/contact"

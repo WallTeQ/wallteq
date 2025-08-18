@@ -266,6 +266,12 @@ const NavBar = () => {
               )}
             </div>
           ))}
+          <Link
+            to="/auth"
+            className="inline-flex bg-blue-800 items-center gap-3 text-white px-5 py-1 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group "
+          >
+            <span>Login</span>
+          </Link>
         </div>
       </div>
     </header>

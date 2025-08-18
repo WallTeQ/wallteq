@@ -24,7 +24,7 @@ const About = () => {
 
     return (
         <section className="relative w-full pt-16 overflow-hidden">
-            <main className="relative z-10 w-full px-2 md:px-6 max-w-7xl mx-auto">
+            <div className="container mx-auto px-4">
                 {/* Top Section */}
                 <motion.div
                     className="space-y-6 mb-16 text-center lg:text-left lg:flex lg:items-center lg:justify-between lg:space-x-12"
@@ -113,7 +113,7 @@ const About = () => {
                         </motion.div>
                     </Link>
                 </motion.div>
-            </main>
+            </div>
 
             
         </section>
