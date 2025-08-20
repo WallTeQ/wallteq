@@ -9,17 +9,18 @@ import ContactSection from '../components/ContactSection';
 
 function Home() {
   return (
-    <div>
-      <Hero />
-      <TrustedBy />
-      <About />
-      <Services />
-      <ServiceType />
-      <TemplateShowcase />
-      <ContactSection />
-      {/* <Footer /> */}
-     
-    </div>
+    <>
+      <main className=''>
+        <Hero />
+        <TrustedBy />
+        <About />
+        <Services />
+        <ServiceType />
+        <TemplateShowcase />
+        <ContactSection />
+        {/* <Footer /> */}
+      </main>
+    </>
   );
 }
 

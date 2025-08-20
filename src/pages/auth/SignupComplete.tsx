@@ -85,7 +85,7 @@ export function SignupComplete({ email, onSuccess }: SignupCompleteProps) {
 
             // Store token and redirect
             if (response.token) {
-                localStorage.setItem("auth_token", response.token)
+                localStorage.setItem("token", response.token)
                 onSuccess(response.token, response.user)
             }
         } catch (error: any) {

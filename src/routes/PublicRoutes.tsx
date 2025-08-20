@@ -19,6 +19,7 @@ import Contact from "../pages/Contact";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
 import AuthPage from "../pages/auth/Auth";
+import NotFound from "../pages/NotFound";
 import ContactSection from "../components/ContactSection";
 const PublicRoutes: React.FC = () => (
   <>
@@ -41,6 +42,8 @@ const PublicRoutes: React.FC = () => (
       <Route path="/services/network-cabling" element={<NetworkCabling />} />
       <Route path="/services/software-development" element={<MobileSoftwareDevelopment />} />
       <Route path="/contact-us" element={<Contact />} />
+      //not found
+      <Route path="*" element={<NotFound />} />
     </Routes>
     <Footer />
   </>
