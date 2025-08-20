@@ -50,6 +50,7 @@ export const useTemplates = () => {
     setError(null);
     try {
       const response = await api.get(`/api/templates/${id}`);
+      console.log('templates', response);
       return response.data || response.template || response;
     } catch (err: any) {
       setError(err.message || "Failed to fetch template");

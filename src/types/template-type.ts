@@ -18,6 +18,7 @@ export interface Template {
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;
+  media?: TemplateMedia[];
 }
 
 

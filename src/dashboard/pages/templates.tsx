@@ -11,7 +11,14 @@ interface Template {
     title: string
     description: string
     price: number
-    status: "pending" | "published" | "rejected"
+    status: "PENDING" | "PUBLISHED" | "REJECTED"
+    media?: Array<{
+        id: string
+        fileName: string
+        fileUrl: string
+        mimeType: string
+        fileSize: number
+    }>
     categoryId: string
     category?: {
         id: string
@@ -52,7 +59,7 @@ const TemplatesPage = () => {
             template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             template.description.toLowerCase().includes(searchTerm.toLowerCase())
         const matchesCategory = filterCategory === "all" || template.category?.id === filterCategory
-        const matchesStatus = filterStatus === "all" || template.status === filterStatus
+    const matchesStatus = filterStatus === "all" || template.status === filterStatus.toUpperCase()
 
         return matchesSearch && matchesCategory && matchesStatus
     })
@@ -104,9 +111,9 @@ const TemplatesPage = () => {
 
     const getStatusBadge = (status: string) => {
         const styles = {
-            published: "bg-green-100 text-green-800",
-            pending: "bg-yellow-100 text-yellow-800",
-            rejected: "bg-red-100 text-red-800",
+            PUBLISHED: "bg-green-100 text-green-800",
+            PENDING: "bg-yellow-100 text-yellow-800",
+            REJECTED: "bg-red-100 text-red-800",
         }
         return styles[status as keyof typeof styles] || "bg-gray-100 text-gray-800"
     }
@@ -114,9 +121,9 @@ const TemplatesPage = () => {
     const getStatusCounts = () => {
         return {
             total: templates.length,
-            published: templates.filter((t) => t.status === "published").length,
-            pending: templates.filter((t) => t.status === "pending").length,
-            rejected: templates.filter((t) => t.status === "rejected").length,
+            published: templates.filter((t) => t.status === "PUBLISHED").length,
+            pending: templates.filter((t) => t.status === "PENDING").length,
+            rejected: templates.filter((t) => t.status === "REJECTED").length,
         }
     }
 
@@ -282,32 +289,40 @@ const TemplatesPage = () => {
             {/* Templates Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredTemplates.map((template) => (
-                    <div
-                        key={template.id}
-                        className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
-                    >
-                        <div className="relative">
-                            <img
-                                src={`/placeholder.svg?height=200&width=300&text=${encodeURIComponent(template.title)}`}
-                                alt={template.title}
-                                className="w-full h-48 object-cover"
-                            />
-                            <div className="absolute top-2 left-2">
-                                <span
-                                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(template.status)}`}
-                                >
-                                    {template.status}
-                                </span>
+                        <div
+                            key={template.id}
+                            className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+                        >
+                            <div className="relative">
+                                {template.media && template.media.length > 0 ? (
+                                    <img
+                                        src={template.media[0].fileUrl}
+                                        alt={template.media[0].fileName}
+                                        className="w-full h-48 object-cover"
+                                    />
+                                ) : (
+                                    <img
+                                        src={`/placeholder.svg?height=200&width=300&text=${encodeURIComponent(template.title)}`}
+                                        alt={template.title}
+                                        className="w-full h-48 object-cover"
+                                    />
+                                )}
+                                <div className="absolute top-2 left-2">
+                                    <span
+                                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(template.status)}`}
+                                    >
+                                        {template.status}
+                                    </span>
+                                </div>
+                                <div className="absolute top-2 right-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedTemplates.includes(template.id)}
+                                        onChange={() => handleSelectTemplate(template.id)}
+                                        className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                    />
+                                </div>
                             </div>
-                            <div className="absolute top-2 right-2">
-                                <input
-                                    type="checkbox"
-                                    checked={selectedTemplates.includes(template.id)}
-                                    onChange={() => handleSelectTemplate(template.id)}
-                                    className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                                />
-                            </div>
-                        </div>
 
                         <div className="p-4">
                             <div className="flex items-center justify-between mb-2">
@@ -361,7 +376,7 @@ const TemplatesPage = () => {
                                 </div>
 
                                 {/* Publish Button for Pending Templates */}
-                                {template.status === "pending" && (
+                                {template.status === "PENDING" && (
                                     <button
                                         onClick={() => setShowConfirmDialog(template.id)}
                                         disabled={publishingTemplates.has(template.id)}
