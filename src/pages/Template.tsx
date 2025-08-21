@@ -101,10 +101,13 @@ const TemplatesPage = () => {
     fetchPublishedTemplates()
   }, [])
 
-  if (templatesLoading) {
+  if (templatesLoading && templates.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black pt-16 flex items-center justify-center">
-        <div className="text-white text-xl">Loading templates...</div>
+      <div className="space-y-6">
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+          <span className="ml-3 text-gray-600">Loading templates...</span>
+        </div>
       </div>
     )
   }

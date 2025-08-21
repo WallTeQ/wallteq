@@ -1,29 +1,33 @@
 import React from "react";
-import { Navigate, useLocation } from "react-router";
+import { Navigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import AdminRoutes from "./AdminRoutes";
 import DashboardLayout from "../dashboard/layout/DashboardLayout";
 import InvalidRole from "../pages/InvalidRole";
 
 const ProtectedRoute: React.FC = () => {
-  const location = useLocation();
-  const { token, role } = useAuth();
+  const { token, user, loading } = useAuth();
+
   console.log("ProtectedRoute token:", token);
-  console.log("ProtectedRoute - token exists:", !!token);
-  console.log("ProtectedRoute - role:", role);
-  console.log("ProtectedRoute - rendering DashboardLayout");
+  console.log("ProtectedRoute - role:", user?.role);
 
+  // Show loading while auth state is being determined
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-500"></div>
+      </div>
+    );
+  }
 
+  // Redirect to auth if not authenticated
   if (!token) {
-    // If not authenticated, do not render protected routes. Public routes will be rendered by the main router.
-    return null;
+    return <Navigate to="/auth" replace />;
   }
 
   let RoutesComponent;
-  switch (role) {
+  switch (user?.role) {
     case "super-admin":
-      RoutesComponent = <AdminRoutes />;
-      break;
     case "admin":
       RoutesComponent = <AdminRoutes />;
       break;

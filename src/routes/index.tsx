@@ -5,32 +5,45 @@ import { useAuth } from "../contexts/AuthContext";
 import ProtectedRoute from "./ProtectedRoutes";
 
 const PageRoutes = () => {
-  const { token, role } = useAuth();
+  const { token, user, loading } = useAuth(); // Add loading state from context
   const navigate = useNavigate();
   const location = useLocation();
+
   console.log("PageRoutes - token:", token);
-  console.log("PageRoutes - role:", role);
-  // Fastest check: avoid unnecessary array includes and null checks
-  const systemUser = role === "admin" || role === "super-admin";
+  console.log("PageRoutes - role:", user?.role);
+  console.log("PageRoutes - loading:", loading);
+
+  const systemUser = user?.role === "admin" || user?.role === "super-admin";
 
   useEffect(() => {
+    // Don't redirect while still loading auth state
+    if (loading) return;
+
     // Only run if token and role are truthy and on auth pages
-    if (!token || !role) return;
+    if (!token || !user?.role) return;
     if (!location.pathname.startsWith("/auth")) return;
 
     if (systemUser) {
       navigate("/dashboard", { replace: true });
-    } else if (role === "user") {
+    } else if (user?.role === "user") {
       navigate("/", { replace: true });
     }
-  }, [token, role, systemUser, navigate, location.pathname]);
+  }, [token, user?.role, systemUser, navigate, location.pathname, loading]);
+
+  // Show loading spinner while auth state is being determined
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-500"></div>
+      </div>
+    );
+  }
 
   return (
     <Routes>
-      {/* Only authenticated users with proper roles can access dashboard */}
-      {token && systemUser && (
-        <Route path="/dashboard/*" element={<ProtectedRoute />} />
-      )}
+      {/* Always render the dashboard route if user exists, let ProtectedRoute handle auth */}
+      <Route path="/dashboard/*" element={<ProtectedRoute />} />
+
       {/* All users can access public routes */}
       <Route path="/*" element={<PublicRoutes />} />
     </Routes>

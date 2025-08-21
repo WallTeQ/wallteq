@@ -6,7 +6,7 @@ export class AuthService {
 
   constructor(token?: string) {
     this.api = new API(token);
-    console.log("🔧 AuthService initialized");
+    
   }
 
   // Method to get stored token
@@ -23,7 +23,7 @@ export class AuthService {
   private storeToken(token: string) {
     if (typeof window !== "undefined") {
       localStorage.setItem("auth_token", token);
-      localStorage.setItem("token", token); // Keep both for compatibility
+      localStorage.setItem("token", token); 
       this.api.setToken(token);
     }
   }

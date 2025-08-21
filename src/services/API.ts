@@ -10,13 +10,13 @@ export class API {
   constructor(token = "") {
     this.token = token
     this._url = import.meta.env?.VITE_SERVER_URL 
-    console.log("🔧 API initialized with URL:", this._url)
+    
   }
 
   // Method to update token after login
   setToken(token: string) {
     this.token = token
-    console.log("🔧 API token updated")
+    
   }
 
   // Method to get token from localStorage if not provided
@@ -33,7 +33,7 @@ export class API {
         localStorage.getItem("access_token")
       if (storedToken) {
         this.token = storedToken
-        console.log("🔧 Token retrieved from localStorage:", storedToken.substring(0, 20) + "...")
+        
         return storedToken
       }
     }
@@ -47,9 +47,6 @@ export class API {
       let requestOptions: RequestInit
       const authToken = this.getAuthToken(token)
 
-      // Log token status for debugging
-      console.log("🔧 POST Request to:", url)
-      console.log("🔧 Auth token available:", authToken ? "✓" : "✗")
       if (authToken) {
         console.log("🔧 Token preview:", authToken.substring(0, 20) + "...")
       }
@@ -177,8 +174,6 @@ export class API {
       if (authToken) {
         myHeaders.append("Authorization", "Bearer " + authToken)
       }
-
-      console.log("🔧 GET Request:", url, "with token:", authToken ? "✓" : "✗")
 
       const requestOptions: RequestInit = {
         method: "GET",
