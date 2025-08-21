@@ -1,27 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { AuthService } from "../services/AuthService";
 import { User } from "../types/iUser";
+import { AuthContextType } from "../types/iUser";
 
-interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  role: string | null;
-  loading: boolean;
-  error: string | null;
-  validationErrors: string[] | null;
-  successMessage: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  signup: (name: string, email: string, password: string) => Promise<void>;
-  // New 3-step signup process
-  initiateSignup: (email: string) => Promise<void>;
-  verifySignupOTP: (email: string, otp: string) => Promise<void>;
-  completeSignup: (email: string, name: string, password: string) => Promise<void>;
-  forgotPassword: (email: string) => Promise<boolean>;
-  verifyOTP: (email: string, otp: string) => Promise<boolean>;
-  resetPassword: (email: string, otp: string, newPassword: string) => Promise<boolean>;
-  clearMessages: () => void;
-}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -46,13 +27,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const authService = new AuthService(token || undefined);
 
   useEffect(() => {
-    console.log("🔄 [AUTH_CONTEXT] Initializing auth state...")
     // Load user/token from localStorage
     const storedToken = localStorage.getItem("token") || sessionStorage.getItem("token");
     const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
 
-    console.log("🔄 [AUTH_CONTEXT] Stored token:", storedToken ? "Found" : "None");
-    console.log("🔄 [AUTH_CONTEXT] Stored user:", storedUser ? "Found" : "None");
 
     if (storedToken && storedUser) {
       try {
@@ -60,9 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setToken(storedToken);
         setUser(parsedUser);
         setRole(parsedUser.role || null);
-        console.log("✅ [AUTH_CONTEXT] Auth state restored:", parsedUser.role);
       } catch (error) {
-        console.error("❌ [AUTH_CONTEXT] Failed to parse stored user:", error);
         // Clear invalid data
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -71,36 +47,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     }
 
-    setLoading(false); // Done loading initial state
-    console.log("✅ [AUTH_CONTEXT] Initialization complete");
+    setLoading(false); 
   }, []);
 
   const login = async (email: string, password: string) => {
-    console.log("🔐 [AUTH_CONTEXT] Login attempt for:", email);
     setLoading(true);
     setError(null);
     setSuccessMessage(null);
     try {
       const res = await authService.login({ email, password });
-      console.log("🔐 [AUTH_CONTEXT] Login response:", res);
 
       if (res?.token && res?.user) {
-        console.log("✅ [AUTH_CONTEXT] Setting auth state");
         setToken(res.token);
         setUser(res.user);
         setRole(res.user.role || null);
         localStorage.setItem("token", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
-        console.log("✅ [AUTH_CONTEXT] Auth state updated successfully");
       } else if (res?.error) {
-        console.error("❌ [AUTH_CONTEXT] Login error:", res.error);
         setError(res.error);
       } else {
-        console.error("❌ [AUTH_CONTEXT] Login failed - no token/user");
         setError("Login failed");
       }
     } catch (err: any) {
-      console.error("❌ [AUTH_CONTEXT] Login exception:", err);
       // Try to extract error message from server response
       if (err && typeof err === 'object' && err.error) {
         setError(err.error);
@@ -115,15 +83,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = async () => {
-    console.log("🚪 [AUTH_CONTEXT] Logging out");
     try {
       // Call the server logout endpoint
       await authService.logout();
     } catch (err) {
-      console.error("Server logout failed:", err);
-      // Continue with local logout even if server call fails
     } finally {
-      // Clear local state and storage regardless of server response
       setToken(null);
       setUser(null);
       setRole(null);
@@ -131,7 +95,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem("user");
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("user");
-      console.log("✅ [AUTH_CONTEXT] Logout complete");
     }
   };
 
@@ -157,9 +120,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setSuccessMessage("Account created successfully!");
         }
       }
-      // Note: No else block here - errors are handled by the service throwing exceptions
     } catch (err: any) {
-      // Extract error message and validation details from server response
       if (err && typeof err === 'object') {
         if (err.details && Array.isArray(err.details)) {
           setValidationErrors(err.details);
@@ -248,7 +209,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // New 3-step signup process
   const initiateSignup = async (email: string) => {
     setLoading(true);
-    // Only clear messages on success, not at the start
     try {
       const res = await authService.initiateSignup({ email });
       if (res?.message) {

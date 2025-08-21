@@ -11,7 +11,6 @@ const ProtectedRoute: React.FC = () => {
   console.log("ProtectedRoute token:", token);
   console.log("ProtectedRoute - role:", user?.role);
 
-  // Show loading while auth state is being determined
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -20,7 +19,7 @@ const ProtectedRoute: React.FC = () => {
     );
   }
 
-  // Redirect to auth if not authenticated
+  
   if (!token) {
     return <Navigate to="/auth" replace />;
   }

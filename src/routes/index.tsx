@@ -5,18 +5,14 @@ import { useAuth } from "../contexts/AuthContext";
 import ProtectedRoute from "./ProtectedRoutes";
 
 const PageRoutes = () => {
-  const { token, user, loading } = useAuth(); // Add loading state from context
+  const { token, user, loading } = useAuth(); 
   const navigate = useNavigate();
   const location = useLocation();
 
-  console.log("PageRoutes - token:", token);
-  console.log("PageRoutes - role:", user?.role);
-  console.log("PageRoutes - loading:", loading);
 
   const systemUser = user?.role === "admin" || user?.role === "super-admin";
 
   useEffect(() => {
-    // Don't redirect while still loading auth state
     if (loading) return;
 
     // Only run if token and role are truthy and on auth pages
