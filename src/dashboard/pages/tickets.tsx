@@ -1,170 +1,196 @@
-import { useState } from "react"
-import { Search, Filter, Download, Plus, Eye, MessageSquare, Clock, User, Calendar } from "lucide-react"
+import { useCallback, useMemo, useState } from "react"
+import {
+    Search,
+    Filter,
+    Download,
+    Plus,
+    MessageSquare,
+    Clock,
+    User,
+    Calendar,
+    Send,
+    X,
+    CheckCircle,
+} from "lucide-react"
+import { useTickets } from "../../hook/useTicket"
+import {useEffect} from "react"
 
 interface Ticket {
     id: string
-    title: string
-    description: string
-    status: "open" | "in-progress" | "resolved" | "closed"
-    priority: "low" | "medium" | "high" | "urgent"
-    category: "template-customization" | "technical-support" | "billing" | "general"
-    customerName: string
-    customerEmail: string
-    assignedTo?: string
-    createdDate: string
-    updatedDate: string
-    responseTime: string
-    messages: number
+    ticketNumber: string
+    inquiry: string
+    status: "OPEN" | "IN_PROGRESS" | "CLOSED" | "FINALIZED"
+    adminResponse?: string
+    user: {
+        id: string
+        name: string
+        email: string
+    }
+    templates: Array<{
+        id: string
+        title: string
+        price: number
+        category?: {
+            id: string
+            name: string
+        }
+    }>
+    createdAt: string
+    updatedAt: string
 }
 
-const mockTickets: Ticket[] = [
-    {
-        id: "TKT-001",
-        title: "Corporate template customization request",
-        description: "Need to customize the corporate template with company branding and specific color scheme",
-        status: "open",
-        priority: "high",
-        category: "template-customization",
-        customerName: "John Doe",
-        customerEmail: "john@company.com",
-        assignedTo: "Sarah Wilson",
-        createdDate: "2024-01-20T10:30:00Z",
-        updatedDate: "2024-01-20T14:15:00Z",
-        responseTime: "2h 15m",
-        messages: 3,
-    },
-    {
-        id: "TKT-002",
-        title: "E-commerce payment integration issue",
-        description: "Having trouble integrating PayPal payment gateway with the e-commerce template",
-        status: "in-progress",
-        priority: "urgent",
-        category: "technical-support",
-        customerName: "Jane Smith",
-        customerEmail: "jane@store.com",
-        assignedTo: "Mike Johnson",
-        createdDate: "2024-01-19T16:45:00Z",
-        updatedDate: "2024-01-20T09:30:00Z",
-        responseTime: "45m",
-        messages: 7,
-    },
-    {
-        id: "TKT-003",
-        title: "Billing inquiry for multiple templates",
-        description: "Question about bulk pricing for purchasing 5+ templates for different projects",
-        status: "resolved",
-        priority: "medium",
-        category: "billing",
-        customerName: "Robert Brown",
-        customerEmail: "robert@agency.com",
-        createdDate: "2024-01-18T11:20:00Z",
-        updatedDate: "2024-01-19T15:45:00Z",
-        responseTime: "1h 30m",
-        messages: 5,
-    },
-    {
-        id: "TKT-004",
-        title: "Portfolio template mobile responsiveness",
-        description: "Portfolio template not displaying correctly on mobile devices, images are not scaling properly",
-        status: "open",
-        priority: "medium",
-        category: "technical-support",
-        customerName: "Emily Davis",
-        customerEmail: "emily@creative.com",
-        createdDate: "2024-01-20T08:15:00Z",
-        updatedDate: "2024-01-20T08:15:00Z",
-        responseTime: "Pending",
-        messages: 1,
-    },
-    {
-        id: "TKT-005",
-        title: "General inquiry about custom development",
-        description: "Interested in custom website development services beyond templates",
-        status: "closed",
-        priority: "low",
-        category: "general",
-        customerName: "David Wilson",
-        customerEmail: "david@startup.io",
-        createdDate: "2024-01-17T14:30:00Z",
-        updatedDate: "2024-01-18T10:20:00Z",
-        responseTime: "3h 45m",
-        messages: 4,
-    },
-]
+const TicketStatus = {
+    OPEN: "OPEN",
+    IN_PROGRESS: "IN_PROGRESS",
+    CLOSED: "CLOSED",
+    FINALIZED: "FINALIZED",
+} as const
 
-const TicketsPage = () => {
-    const [tickets, setTickets] = useState<Ticket[]>(mockTickets)
+const statusColors = {
+    OPEN: "bg-blue-100 text-blue-800",
+    IN_PROGRESS: "bg-yellow-100 text-yellow-800",
+    CLOSED: "bg-gray-100 text-gray-800",
+    FINALIZED: "bg-green-100 text-green-800",
+} as const
+
+export default function TicketsPage() {
+    const { tickets, loading, error, createTicket, respondToTicket, finalizeSale, getTicketStats } = useTickets()
+
     const [searchTerm, setSearchTerm] = useState("")
     const [filterStatus, setFilterStatus] = useState<string>("all")
-    const [filterPriority, setFilterPriority] = useState<string>("all")
-    const [filterCategory, setFilterCategory] = useState<string>("all")
     const [selectedTickets, setSelectedTickets] = useState<string[]>([])
     const [showFilters, setShowFilters] = useState(false)
+    const [showCreateModal, setShowCreateModal] = useState(false)
+    const [showResponseModal, setShowResponseModal] = useState(false)
+    const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
+    const [newTicketInquiry, setNewTicketInquiry] = useState("")
+    const [adminResponse, setAdminResponse] = useState("")
+    const [createSuccess, setCreateSuccess] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const filteredTickets = tickets.filter((ticket) => {
-        const matchesSearch =
-            ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            ticket.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            ticket.id.toLowerCase().includes(searchTerm.toLowerCase())
-        const matchesStatus = filterStatus === "all" || ticket.status === filterStatus
-        const matchesPriority = filterPriority === "all" || ticket.priority === filterPriority
-        const matchesCategory = filterCategory === "all" || ticket.category === filterCategory
+    // Memoize filtered tickets to prevent unnecessary recalculations
+    const filteredTickets = useMemo(() => {
+        return tickets.filter((ticket) => {
+            const matchesSearch =
+                ticket.ticketNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                ticket.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                ticket.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                ticket.inquiry.toLowerCase().includes(searchTerm.toLowerCase())
 
-        return matchesSearch && matchesStatus && matchesPriority && matchesCategory
-    })
+            const matchesStatus = filterStatus === "all" || ticket.status === filterStatus
 
-    const handleSelectTicket = (ticketId: string) => {
+            return matchesSearch && matchesStatus
+        })
+    }, [tickets, searchTerm, filterStatus])
+
+    // Memoize stats to prevent unnecessary recalculations
+    const stats = useMemo(() => getTicketStats(), [tickets])
+
+    const handleSelectTicket = useCallback((ticketId: string) => {
         setSelectedTickets((prev) => (prev.includes(ticketId) ? prev.filter((id) => id !== ticketId) : [...prev, ticketId]))
-    }
+    }, [])
 
-    const handleSelectAll = () => {
+    const handleSelectAll = useCallback(() => {
         setSelectedTickets(
             selectedTickets.length === filteredTickets.length ? [] : filteredTickets.map((ticket) => ticket.id),
         )
-    }
+    }, [selectedTickets.length, filteredTickets])
 
-    const getStatusBadge = (status: string) => {
-        const styles = {
-            open: "bg-blue-100 text-blue-800",
-            "in-progress": "bg-yellow-100 text-yellow-800",
-            resolved: "bg-green-100 text-green-800",
-            closed: "bg-gray-100 text-gray-800",
-        }
-        return styles[status as keyof typeof styles] || styles.open
-    }
+    const getStatusBadge = useCallback((status: string) => {
+        return statusColors[status as keyof typeof statusColors] || statusColors[TicketStatus.OPEN]
+    }, [])
 
-    const getPriorityBadge = (priority: string) => {
-        const styles = {
-            low: "bg-gray-100 text-gray-800",
-            medium: "bg-blue-100 text-blue-800",
-            high: "bg-orange-100 text-orange-800",
-            urgent: "bg-red-100 text-red-800",
-        }
-        return styles[priority as keyof typeof styles] || styles.medium
-    }
-
-    const formatDate = (dateString: string) => {
+    const formatDate = useCallback((dateString: string) => {
         return (
             new Date(dateString).toLocaleDateString() +
             " " +
             new Date(dateString).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         )
-    }
+    }, [])
 
-    const getTicketStats = () => {
-        return {
-            total: tickets.length,
-            open: tickets.filter((t) => t.status === "open").length,
-            inProgress: tickets.filter((t) => t.status === "in-progress").length,
-            resolved: tickets.filter((t) => t.status === "resolved").length,
+    const handleCreateTicket = useCallback(async () => {
+        if (!newTicketInquiry.trim()) {
+            alert("Please enter an inquiry")
+            return
         }
-    }
 
-    const stats = getTicketStats()
+        setIsSubmitting(true)
+        try {
+            await createTicket({ inquiry: newTicketInquiry })
+            setCreateSuccess(true)
+            setNewTicketInquiry("")
+            setTimeout(() => {
+                setShowCreateModal(false)
+                setCreateSuccess(false)
+            }, 3000)
+        } catch (error) {
+            console.error("Failed to create ticket:", error)
+            alert("Failed to create ticket. Please try again.")
+        } finally {
+            setIsSubmitting(false)
+        }
+    }, [newTicketInquiry, createTicket])
+
+    const handleRespondToTicket = useCallback(async () => {
+        if (!adminResponse.trim() || !selectedTicket) {
+            alert("Please enter a response")
+            return
+        }
+
+        setIsSubmitting(true)
+        try {
+            await respondToTicket(selectedTicket.id, { adminResponse })
+            setShowResponseModal(false)
+            setAdminResponse("")
+            setSelectedTicket(null)
+        } catch (error) {
+            console.error("Failed to respond to ticket:", error)
+            alert("Failed to respond to ticket. Please try again.")
+        } finally {
+            setIsSubmitting(false)
+        }
+    }, [adminResponse, selectedTicket, respondToTicket])
+
+    const handleFinalizeSale = useCallback(
+        async (ticketId: string) => {
+            if (!confirm("Are you sure you want to finalize this sale? This action cannot be undone.")) {
+                return
+            }
+
+            setIsSubmitting(true)
+            try {
+                await finalizeSale(ticketId)
+            } catch (error) {
+                console.error("Failed to finalize sale:", error)
+                alert("Failed to finalize sale. Please try again.")
+            } finally {
+                setIsSubmitting(false)
+            }
+        },
+        [finalizeSale],
+    )
+
+    const clearFilters = useCallback(() => {
+        setFilterStatus("all")
+        setSearchTerm("")
+    }, [])
+
+    // Only fetch tickets once on mount - removed fetchTickets from dependency array
+    useEffect(() => {
+        // The useTickets hook should handle initial data fetching
+        // No need to call fetchTickets here if the hook does it automatically
+    }, [])
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+            </div>
+        )
+    }
 
     return (
         <div className="space-y-6">
-
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="bg-white rounded-lg p-6 border border-gray-200">
@@ -197,10 +223,10 @@ const TicketsPage = () => {
                 <div className="bg-white rounded-lg p-6 border border-gray-200">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-600">Resolved</p>
-                            <p className="text-2xl font-bold text-gray-900">{stats.resolved}</p>
+                            <p className="text-sm font-medium text-gray-600">Finalized</p>
+                            <p className="text-2xl font-bold text-gray-900">{stats.finalized}</p>
                         </div>
-                        <MessageSquare className="h-8 w-8 text-green-500" />
+                        <CheckCircle className="h-8 w-8 text-green-500" />
                     </div>
                 </div>
             </div>
@@ -233,7 +259,10 @@ const TicketsPage = () => {
                             <Download className="h-4 w-4" />
                             <span>Export</span>
                         </button>
-                        <button className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600">
+                        <button
+                            onClick={() => setShowCreateModal(true)}
+                            className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600"
+                        >
                             <Plus className="h-4 w-4" />
                             <span>New Ticket</span>
                         </button>
@@ -251,50 +280,14 @@ const TicketsPage = () => {
                                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 >
                                     <option value="all">All Status</option>
-                                    <option value="open">Open</option>
-                                    <option value="in-progress">In Progress</option>
-                                    <option value="resolved">Resolved</option>
-                                    <option value="closed">Closed</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                                <select
-                                    value={filterPriority}
-                                    onChange={(e) => setFilterPriority(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                >
-                                    <option value="all">All Priority</option>
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                    <option value="urgent">Urgent</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                                <select
-                                    value={filterCategory}
-                                    onChange={(e) => setFilterCategory(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                >
-                                    <option value="all">All Categories</option>
-                                    <option value="template-customization">Template Customization</option>
-                                    <option value="technical-support">Technical Support</option>
-                                    <option value="billing">Billing</option>
-                                    <option value="general">General</option>
+                                    <option value={TicketStatus.OPEN}>Open</option>
+                                    <option value={TicketStatus.IN_PROGRESS}>In Progress</option>
+                                    <option value={TicketStatus.CLOSED}>Closed</option>
+                                    <option value={TicketStatus.FINALIZED}>Finalized</option>
                                 </select>
                             </div>
                             <div className="flex items-end">
-                                <button
-                                    onClick={() => {
-                                        setFilterStatus("all")
-                                        setFilterPriority("all")
-                                        setFilterCategory("all")
-                                        setSearchTerm("")
-                                    }}
-                                    className="px-4 py-2 text-gray-600 hover:text-gray-900"
-                                >
+                                <button onClick={clearFilters} className="px-4 py-2 text-gray-600 hover:text-gray-900">
                                     Clear Filters
                                 </button>
                             </div>
@@ -324,13 +317,10 @@ const TicketsPage = () => {
                                     Customer
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Templates
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Status
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Priority
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Assigned To
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Created
@@ -353,49 +343,58 @@ const TicketsPage = () => {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div>
-                                            <div className="text-sm font-medium text-gray-900">{ticket.id}</div>
-                                            <div className="text-sm text-gray-600 max-w-xs truncate">{ticket.title}</div>
-                                            <div className="flex items-center mt-1">
-                                                <MessageSquare className="h-3 w-3 text-gray-400 mr-1" />
-                                                <span className="text-xs text-gray-500">{ticket.messages} messages</span>
-                                            </div>
+                                            <div className="text-sm font-medium text-gray-900">{ticket.ticketNumber}</div>
+                                            <div className="text-sm text-gray-600 max-w-xs truncate">{ticket.inquiry}</div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div>
-                                            <div className="text-sm font-medium text-gray-900">{ticket.customerName}</div>
-                                            <div className="text-sm text-gray-500">{ticket.customerEmail}</div>
+                                            <div className="text-sm font-medium text-gray-900">{ticket.user.name}</div>
+                                            <div className="text-sm text-gray-500">{ticket.user.email}</div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="text-sm text-gray-900">
+                                            {ticket.templates.length} template(s)
+                                            <div className="text-xs text-gray-500">
+                                                Total: ${ticket.templates.reduce((sum, t) => sum + t.price, 0)}
+                                            </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <span
                                             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(ticket.status)}`}
                                         >
-                                            {ticket.status.replace("-", " ")}
+                                            {ticket.status.replace("_", " ")}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <span
-                                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityBadge(ticket.priority)}`}
-                                        >
-                                            {ticket.priority}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-900">{ticket.assignedTo || "Unassigned"}</td>
                                     <td className="px-6 py-4 text-sm text-gray-500">
                                         <div className="flex items-center">
                                             <Calendar className="h-3 w-3 mr-1" />
-                                            {formatDate(ticket.createdDate)}
+                                            {formatDate(ticket.createdAt)}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center space-x-2">
-                                            <button className="p-1 text-gray-400 hover:text-gray-600">
-                                                <Eye className="h-4 w-4" />
-                                            </button>
-                                            <button className="p-1 text-gray-400 hover:text-blue-600">
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedTicket(ticket)
+                                                    setShowResponseModal(true)
+                                                }}
+                                                className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                                disabled={isSubmitting}
+                                            >
                                                 <MessageSquare className="h-4 w-4" />
                                             </button>
+                                            {ticket.status !== TicketStatus.FINALIZED && (
+                                                <button
+                                                    onClick={() => handleFinalizeSale(ticket.id)}
+                                                    className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+                                                    disabled={isSubmitting}
+                                                >
+                                                    <CheckCircle className="h-4 w-4" />
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
@@ -404,21 +403,178 @@ const TicketsPage = () => {
                     </table>
                 </div>
 
+                {filteredTickets.length === 0 && (
+                    <div className="text-center py-12">
+                        <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-500 text-lg">
+                            {searchTerm || filterStatus !== "all"
+                                ? "No tickets found matching your criteria"
+                                : "No tickets available"}
+                        </p>
+                    </div>
+                )}
+
                 {/* Pagination */}
                 <div className="bg-white px-6 py-3 border-t border-gray-200 flex items-center justify-between">
                     <div className="text-sm text-gray-700">
                         Showing {filteredTickets.length} of {tickets.length} tickets
                     </div>
                     <div className="flex items-center space-x-2">
-                        <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Previous</button>
+                        <button
+                            className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 disabled:opacity-50"
+                            disabled
+                        >
+                            Previous
+                        </button>
                         <button className="px-3 py-1 bg-emerald-500 text-white rounded text-sm">1</button>
-                        <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">2</button>
-                        <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Next</button>
+                        <button
+                            className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 disabled:opacity-50"
+                            disabled
+                        >
+                            Next
+                        </button>
                     </div>
                 </div>
             </div>
+
+            {/* Create Ticket Modal */}
+            {showCreateModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg max-w-lg w-full">
+                        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+                            <h2 className="text-xl font-semibold text-gray-900">Create New Ticket</h2>
+                            <button
+                                onClick={() => setShowCreateModal(false)}
+                                className="text-gray-400 hover:text-gray-600"
+                                disabled={isSubmitting}
+                            >
+                                <X className="h-6 w-6" />
+                            </button>
+                        </div>
+
+                        <div className="p-6">
+                            {createSuccess ? (
+                                <div className="text-center py-8">
+                                    <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Ticket Created Successfully!</h3>
+                                    <p className="text-gray-600">The ticket has been created and will use templates from your cart.</p>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="mb-6">
+                                        <label className="block text-gray-700 font-medium mb-2">Inquiry Description:</label>
+                                        <textarea
+                                            value={newTicketInquiry}
+                                            onChange={(e) => setNewTicketInquiry(e.target.value)}
+                                            placeholder="Describe your inquiry or customization requirements..."
+                                            className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                            disabled={isSubmitting}
+                                        />
+                                    </div>
+
+                                    <button
+                                        onClick={handleCreateTicket}
+                                        disabled={isSubmitting || !newTicketInquiry.trim()}
+                                        className="w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                Creating Ticket...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Send className="h-4 w-4" />
+                                                Create Ticket
+                                            </>
+                                        )}
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Response Modal */}
+            {showResponseModal && selectedTicket && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden">
+                        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+                            <h2 className="text-xl font-semibold text-gray-900">Respond to Ticket</h2>
+                            <button
+                                onClick={() => setShowResponseModal(false)}
+                                className="text-gray-400 hover:text-gray-600"
+                                disabled={isSubmitting}
+                            >
+                                <X className="h-6 w-6" />
+                            </button>
+                        </div>
+
+                        <div className="p-6 max-h-96 overflow-y-auto">
+                            <div className="mb-4">
+                                <h3 className="font-medium text-gray-900 mb-2">Ticket: {selectedTicket.ticketNumber}</h3>
+                                <p className="text-gray-600 mb-4">{selectedTicket.inquiry}</p>
+
+                                <div className="mb-4">
+                                    <h4 className="font-medium text-gray-900 mb-2">Templates:</h4>
+                                    <div className="space-y-2">
+                                        {selectedTicket.templates.map((template) => (
+                                            <div key={template.id} className="flex justify-between items-center text-sm">
+                                                <span className="text-gray-700">{template.title}</span>
+                                                <span className="text-emerald-600">${template.price}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {selectedTicket.adminResponse && (
+                                    <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                                        <h4 className="font-medium text-gray-900 mb-1">Previous Response:</h4>
+                                        <p className="text-gray-600 text-sm">{selectedTicket.adminResponse}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="mb-6">
+                                <label className="block text-gray-700 font-medium mb-2">Admin Response:</label>
+                                <textarea
+                                    value={adminResponse}
+                                    onChange={(e) => setAdminResponse(e.target.value)}
+                                    placeholder="Enter your response to the customer..."
+                                    className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    disabled={isSubmitting}
+                                />
+                            </div>
+
+                            <button
+                                onClick={handleRespondToTicket}
+                                disabled={isSubmitting || !adminResponse.trim()}
+                                className="w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                        Sending Response...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send className="h-4 w-4" />
+                                        Send Response
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p className="text-red-600">{error}</p>
+                </div>
+            )}
         </div>
     )
 }
 
-export default TicketsPage;

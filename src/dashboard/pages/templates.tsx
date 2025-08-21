@@ -11,7 +11,7 @@ interface Template {
     title: string
     description: string
     price: number
-    status: "PENDING" | "PUBLISHED" | "REJECTED"
+    status: "pending" | "published" | "rejected"
     media?: Array<{
         id: string
         fileName: string
@@ -111,9 +111,9 @@ const TemplatesPage = () => {
 
     const getStatusBadge = (status: string) => {
         const styles = {
-            PUBLISHED: "bg-green-100 text-green-800",
-            PENDING: "bg-yellow-100 text-yellow-800",
-            REJECTED: "bg-red-100 text-red-800",
+            published: "bg-green-100 text-green-800",
+            pending: "bg-yellow-100 text-yellow-800",
+            rejected: "bg-red-100 text-red-800",
         }
         return styles[status as keyof typeof styles] || "bg-gray-100 text-gray-800"
     }
@@ -121,9 +121,9 @@ const TemplatesPage = () => {
     const getStatusCounts = () => {
         return {
             total: templates.length,
-            published: templates.filter((t) => t.status === "PUBLISHED").length,
-            pending: templates.filter((t) => t.status === "PENDING").length,
-            rejected: templates.filter((t) => t.status === "REJECTED").length,
+            published: templates.filter((t) => t.status === "published").length,
+            pending: templates.filter((t) => t.status === "pending").length,
+            rejected: templates.filter((t) => t.status === "rejected").length,
         }
     }
 
@@ -264,9 +264,9 @@ const TemplatesPage = () => {
                                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 >
                                     <option value="all">All Status</option>
-                                    <option value="PUBLISHED">Published</option>
-                                    <option value="PENDING">Pending</option>
-                                    <option value="REJECTED">Rejected</option>
+                                    <option value="published">Published</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="rejected">Rejected</option>
                                 </select>
                             </div>
                             <div className="flex items-end">
@@ -376,7 +376,7 @@ const TemplatesPage = () => {
                                 </div>
 
                                 {/* Publish Button for Pending Templates */}
-                                {template.status === "PENDING" && (
+                                {template.status === "pending" && (
                                     <button
                                         onClick={() => setShowConfirmDialog(template.id)}
                                         disabled={publishingTemplates.has(template.id)}

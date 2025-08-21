@@ -277,6 +277,7 @@ export const useTemplates = () => {
   // Auto-fetch templates on mount
   useEffect(() => {
     fetchTemplates();
+    fetchPublishedTemplates();
   }, []);
 
   return {

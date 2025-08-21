@@ -3,7 +3,7 @@ export interface Template {
   title: string;
   description: string;
   price: number;
-  status: "PENDING" | "PUBLISHED" | "REJECTED";
+  status: "pending" | "published" | "rejected";
   categoryId: string;
   category?: {
     id: string;

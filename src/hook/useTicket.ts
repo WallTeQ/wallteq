@@ -14,7 +14,7 @@ export const useTickets = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.get("/api/tickets");
+      const response = await api.get("/api/ticket");
 
       if (response.success && response.tickets) {
         setTickets(response.tickets);
@@ -36,7 +36,7 @@ export const useTickets = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.post("/api/tickets/create", data);
+      const response = await api.post("/api/ticket/create", data);
 
       if (response.success && response.ticket) {
         setTickets((prev) => [response.ticket, ...prev]);
@@ -61,7 +61,7 @@ export const useTickets = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.post(`/api/tickets/respond/${ticketId}`, data);
+      const response = await api.post(`/api/ticket/respond/${ticketId}`, data);
 
       if (response.success && response.ticket) {
         setTickets((prev) =>
@@ -87,7 +87,7 @@ export const useTickets = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.post(`/api/tickets/finalize/${ticketId}`, {});
+      const response = await api.post(`/api/ticket/finalize/${ticketId}`, {});
 
       if (response.success && response.ticket) {
         setTickets((prev) =>

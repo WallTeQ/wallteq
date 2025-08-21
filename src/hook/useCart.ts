@@ -24,11 +24,11 @@ export const useCart = () => {
   };
 
   // Add templates to cart
-  const addToCart = async (templateIds: string[]): Promise<boolean> => {
+  const addToCart = async (templateIds: string[], userId: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.post("/api/cart/add", { templateIds });
+      const response = await api.post("/api/cart/add", { templateIds, userId });
       setCart(response.cart || response.data);
       return true;
     } catch (err: any) {
@@ -40,8 +40,8 @@ export const useCart = () => {
   };
 
   // Add single template to cart
-  const addTemplateToCart = async (templateId: string): Promise<boolean> => {
-    return await addToCart([templateId]);
+  const addTemplateToCart = async (templateId: string, userId: string): Promise<boolean> => {
+    return await addToCart([templateId], userId);
   };
 
   // Remove template from cart
