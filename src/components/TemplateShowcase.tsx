@@ -5,11 +5,12 @@ import { Link } from "react-router-dom"
 import { Template } from "../types/template-type"
 import { useCart } from "../hook/useCart"
 import { useTemplates } from "../hook/useTemplate"
-import { useUsers } from "../hook/useUser"
+import { useAuth } from "../contexts/AuthContext"
 
 
 const TemplateShowcase = () => {
-      const [currentUserId, setCurrentUserId] = useState<string>("")
+    
+    const { user } = useAuth()
 
     const { templates, loading: templatesLoading, error: templatesError, fetchPublishedTemplates } = useTemplates()
 
@@ -23,24 +24,21 @@ const TemplateShowcase = () => {
         getCartItemCount,
         isTemplateInCart,
     } = useCart()
-     useEffect(() => {
-        // For now, using a mock user ID - replace with actual auth logic
-        const userId = localStorage.getItem("userId") || "user-123"
-        setCurrentUserId(userId)
-      }, [])
-    
-      // Fetch published templates on mount
-      useEffect(() => {
+        
+        const userId = user?.id || ""
+
+    // Fetch published templates on mount
+    useEffect(() => {
         fetchPublishedTemplates()
-      }, [])
+    }, [])
 
     const handleAddToCart = async (templateId: string) => {
-        if (!currentUserId) {
+        if (userId) {
             alert("Please log in to add templates to cart")
             return
         }
 
-        const success = await addTemplateToCart(templateId, currentUserId)
+        const success = await addTemplateToCart(templateId, userId)
         if (success) {
             // Optional: Show success message
             console.log("Template added to cart successfully")
@@ -77,12 +75,12 @@ const TemplateShowcase = () => {
                             {templates.map((template, index) => (
                                 <AnimatedSection key={template.id} animation="fade-up" delay={index * 30}>
                                     <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                                        <div className="relative overflow-hidden">
+                                        <div className="relative overflow-hidden bg-gray-100">
                                             {template.media && template.media.length > 0 ? (
                                                 <img
                                                     src={template.media[0].fileUrl}
                                                     alt={template.media[0].fileName}
-                                                    className="w-full h-48 object-cover"
+                                                    className="w-full h-48 object-contain object-center"
                                                 />
                                             ) : (
                                                 <img
@@ -92,7 +90,7 @@ const TemplateShowcase = () => {
                                                 />
                                             )}
                                             <div className="absolute top-2 left-2">
-                                                <span className="bg-emerald-500 text-white px-2 py-1 rounded text-xs font-medium">
+                                                <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
                                                     {template.category?.name || "Template"}
                                                 </span>
                                             </div>
@@ -137,7 +135,7 @@ const TemplateShowcase = () => {
                                             ) : (
                                                 <button
                                                     onClick={() => handleAddToCart(template.id)}
-                                                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-3 rounded font-medium transition-all duration-200 flex items-center justify-center text-sm disabled:opacity-50"
+                                                    className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded font-medium transition-all duration-200 flex items-center justify-center text-sm disabled:opacity-50"
                                                     disabled={cartLoading}
                                                 >
                                                     {cartLoading ? (
