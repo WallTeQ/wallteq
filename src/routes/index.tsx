@@ -8,6 +8,8 @@ const PageRoutes = () => {
   const { token, role } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  console.log("PageRoutes - token:", token);
+  console.log("PageRoutes - role:", role);
   // Fastest check: avoid unnecessary array includes and null checks
   const systemUser = role === "admin" || role === "super-admin";
 

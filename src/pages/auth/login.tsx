@@ -53,9 +53,9 @@ export function Login({ onSuccess, onSwitchToSignup, onForgotPassword }: LoginPr
             // Store token
             if (response.token) {
                 if (rememberMe) {
-                    localStorage.setItem("auth_token", response.token)
+                    localStorage.setItem("token", response.token)
                 } else {
-                    sessionStorage.setItem("auth_token", response.token)
+                    sessionStorage.setItem("token", response.token)
                 }
                 onSuccess(response.token, response.user)
             }

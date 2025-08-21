@@ -6,16 +6,24 @@ import Templates from '../pages/templates/index';
 import Tickets from '../pages/tickets/index';
 import Carts from '../pages/cart/index';
 import Contact from '../pages/contact/index';
-
+import NotFound from '../pages/NotFound';
+import UsersPage from '../dashboard/pages/users';
+import TemplatesPage from '../dashboard/pages/templates';
+import OrdersPage from '../dashboard/pages/orders';
+import TicketsPage from '../dashboard/pages/tickets';
+import AddTemplatePage from '../dashboard/pages/add-template';
 const AdminRoutes = () => (
+  console.log("AdminRoutes - rendering"),
   <Routes>
     <Route path="/" element={<Dashboard />} />
-    <Route path="/users" element={<Users />} />
+    <Route path="/users" element={<UsersPage />} />
     <Route path="/categories" element={<CategoryPage />} />
-    <Route path="/Templates" element={<Templates />} />
-    <Route path="/tickets" element={<Tickets />} />
+    <Route path="/templates" element={<TemplatesPage />} />
+    <Route path="/templates/add" element={<AddTemplatePage />} />
+    <Route path="/tickets" element={<TicketsPage />} />
     <Route path="/carts" element={<Carts />} />
-    <Route path="/contacts" element={<Contact />} />
+    <Route path="/orders" element={<OrdersPage />} />
+    <Route path="*" element={<NotFound />} />
   </Routes>
 );
 

@@ -9,6 +9,7 @@ export default function AuthPage() {
 
         // Store user data if needed
         localStorage.setItem("user", JSON.stringify(user))
+        localStorage.setItem("token", token)
 
         // Redirect based on user role
         if (user.role === "admin" || user.role === "super-admin") {

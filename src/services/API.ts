@@ -1,23 +1,64 @@
 
+
 /// <reference types="vite/client" />
-import axios from "axios";
+import axios from "axios"
 
 export class API {
   private token: string
+  private _url: string
+
   constructor(token = "") {
     this.token = token
+    this._url = import.meta.env?.VITE_SERVER_URL 
+    console.log("🔧 API initialized with URL:", this._url)
   }
-  private _url = import.meta.env.VITE_SERVER_URL;
+
+  // Method to update token after login
+  setToken(token: string) {
+    this.token = token
+    console.log("🔧 API token updated")
+  }
+
+  // Method to get token from localStorage if not provided
+  private getAuthToken(providedToken?: string): string {
+    if (providedToken) return providedToken
+    if (this.token) return this.token
+
+    // Try to get token from localStorage
+    if (typeof window !== "undefined") {
+      const storedToken =
+        localStorage.getItem("auth_token") ||
+        localStorage.getItem("token") ||
+        localStorage.getItem("authToken") ||
+        localStorage.getItem("access_token")
+      if (storedToken) {
+        this.token = storedToken
+        console.log("🔧 Token retrieved from localStorage:", storedToken.substring(0, 20) + "...")
+        return storedToken
+      }
+    }
+
+    console.warn("⚠️ No auth token found in localStorage or provided")
+    return ""
+  }
 
   async post(url: string, body: object, token = "") {
     try {
-      let requestOptions: RequestInit;
-      const authToken = token || this.token;
+      let requestOptions: RequestInit
+      const authToken = this.getAuthToken(token)
+
+      // Log token status for debugging
+      console.log("🔧 POST Request to:", url)
+      console.log("🔧 Auth token available:", authToken ? "✓" : "✗")
+      if (authToken) {
+        console.log("🔧 Token preview:", authToken.substring(0, 20) + "...")
+      }
+
       if (body instanceof FormData) {
         // For FormData, do not set Content-Type, browser will set it (with boundary)
-        const headers: any = {};
+        const headers: any = {}
         if (authToken) {
-          headers["Authorization"] = "Bearer " + authToken;
+          headers["Authorization"] = "Bearer " + authToken
         }
         requestOptions = {
           method: "POST",
@@ -25,12 +66,12 @@ export class API {
           body,
           redirect: "follow",
           credentials: "include",
-        };
+        }
       } else {
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
+        const myHeaders = new Headers()
+        myHeaders.append("Content-Type", "application/json")
         if (authToken) {
-          myHeaders.append("Authorization", "Bearer " + authToken);
+          myHeaders.append("Authorization", "Bearer " + authToken)
         }
         requestOptions = {
           method: "POST",
@@ -38,45 +79,51 @@ export class API {
           body: JSON.stringify(body),
           redirect: "follow",
           credentials: "include",
-        };
+        }
       }
-      const response = await fetch(this._url + url, requestOptions);
-      const result = await response.json();
-      
+
+      const response = await fetch(this._url + url, requestOptions)
+      const result = await response.json()
+
       // Check if the response is successful
       if (!response.ok) {
-        console.error("API POST failed with status:", response.status, result);
+        console.error("API POST failed with status:", response.status, result)
+        console.error("Request URL:", this._url + url)
+        console.error("Request body:", body)
+
         // Throw the full error object to preserve server validation details
         throw {
           error: result.error || "Request failed",
           message: result.message || `HTTP ${response.status}`,
           details: result.details || [],
-          status: response.status
-        };
+          status: response.status,
+        }
       }
-      
-      return result;
+
+      return result
     } catch (e: any) {
-      console.error("API POST error:", e);
+      console.error("API POST error:", e)
       // If it's already our formatted error object, re-throw it
-      if (e && typeof e === 'object' && (e.error || e.message || e.details)) {
-        throw e;
+      if (e && typeof e === "object" && (e.error || e.message || e.details)) {
+        throw e
       }
       // Otherwise, throw a generic error
-      throw new Error("API POST Request failed");
+      throw new Error("API POST Request failed")
     }
   }
 
   async put(url: string, body: object | FormData, token = "") {
     try {
-      const myHeaders = new Headers();
+      const myHeaders = new Headers()
       if (!(body instanceof FormData)) {
-        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Content-Type", "application/json")
       }
-      const authToken = token || this.token;
+      const authToken = this.getAuthToken(token)
       if (authToken) {
-        myHeaders.append("Authorization", "Bearer " + authToken);
+        myHeaders.append("Authorization", "Bearer " + authToken)
       }
+
+      console.log("🔧 PUT Request:", url, "with token:", authToken ? "✓" : "✗")
 
       const requestOptions: RequestInit = {
         method: "PUT",
@@ -84,97 +131,110 @@ export class API {
         body: body instanceof FormData ? body : JSON.stringify(body),
         redirect: "follow",
         credentials: "include",
-      };
+      }
 
-      const response = await fetch(this._url + url, requestOptions);
-      const result = await response.json();
-      
-      
+      const response = await fetch(this._url + url, requestOptions)
+      const result = await response.json()
+
       // Check if the response is successful
       if (!response.ok) {
-        console.error("API PUT failed with status:", response.status, result);
-        throw new Error(result.message || result.error || `HTTP ${response.status}`);
+        console.error("API PUT failed with status:", response.status, result)
+        throw new Error(result.message || result.error || `HTTP ${response.status}`)
       }
-      
-      return result;
+
+      return result
     } catch (e) {
-      console.error("API PUT error:", e);
-      throw new Error("API PUT Request failed");
+      console.error("API PUT error:", e)
+      throw new Error("API PUT Request failed")
     }
   }
 
   async uploadImage(file: File, name = undefined) {
-    const formData = new FormData();
-    formData.append("file", file, name ? name : file.name);
-    const res = await axios.post(this._url + "/api/uploads", formData);
+    const formData = new FormData()
+    formData.append("file", file, name ? name : file.name)
+
+    const authToken = this.getAuthToken()
+    const headers: any = {}
+    if (authToken) {
+      headers["Authorization"] = "Bearer " + authToken
+    }
+
+    console.log("🔧 Upload Image with token:", authToken ? "✓" : "✗")
+
+    const res = await axios.post(this._url + "/api/uploads", formData, { headers })
     if (res.data.success) {
-      return { ...res.data, path: this._url + res.data.path };
+      return { ...res.data, path: this._url + res.data.path }
     } else {
-      throw new Error("Image upload failed");
+      throw new Error("Image upload failed")
     }
   }
 
   async get(url: string, token = "") {
     try {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      const authToken = token || this.token;
+      const myHeaders = new Headers()
+      myHeaders.append("Content-Type", "application/json")
+      const authToken = this.getAuthToken(token)
       if (authToken) {
-        myHeaders.append("Authorization", "Bearer " + authToken);
+        myHeaders.append("Authorization", "Bearer " + authToken)
       }
+
+      console.log("🔧 GET Request:", url, "with token:", authToken ? "✓" : "✗")
 
       const requestOptions: RequestInit = {
         method: "GET",
         headers: myHeaders,
         redirect: "follow",
         credentials: "include",
-      };
+      }
 
-      const response = await fetch(this._url + url, requestOptions);
-      const result = await response.json();
-      
+      const response = await fetch(this._url + url, requestOptions)
+      const result = await response.json()
+
       // Check if the response is successful
       if (!response.ok) {
-        console.error("API GET failed with status:", response.status, result);
-        throw new Error(result.message || result.error || `HTTP ${response.status}`);
+        console.error("API GET failed with status:", response.status, result)
+        throw new Error(result.message || result.error || `HTTP ${response.status}`)
       }
-      
-      return result;
+
+      return result
     } catch (e) {
-      console.error("API GET error:", e);
-      throw new Error("API GET Request failed");
+      console.error("API GET error:", e)
+      throw new Error("API GET Request failed")
     }
   }
 
   async delete(url: string, token = "") {
     try {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      const authToken = token || this.token;
+      const myHeaders = new Headers()
+      myHeaders.append("Content-Type", "application/json")
+      const authToken = this.getAuthToken(token)
       if (authToken) {
-        myHeaders.append("Authorization", "Bearer " + authToken);
+        myHeaders.append("Authorization", "Bearer " + authToken)
       }
+
+      console.log("🔧 DELETE Request:", url, "with token:", authToken ? "✓" : "✗")
 
       const requestOptions: RequestInit = {
         method: "DELETE",
         headers: myHeaders,
         redirect: "follow",
         credentials: "include",
-      };
+      }
 
-      const response = await fetch(this._url + url, requestOptions);
-      const result = await response.json();
-      
+      const response = await fetch(this._url + url, requestOptions)
+      const result = await response.json()
+
       // Check if the response is successful
       if (!response.ok) {
-        console.error("API DELETE failed with status:", response.status, result);
-        throw new Error(result.message || result.error || `HTTP ${response.status}`);
+        console.error("API DELETE failed with status:", response.status, result)
+        throw new Error(result.message || result.error || `HTTP ${response.status}`)
       }
-      
-      return result;
+
+      return result
     } catch (e) {
-      console.error("API DELETE error:", e);
-      throw new Error("API DELETE Request failed");
+      console.error("API DELETE error:", e)
+      throw new Error("API DELETE Request failed")
     }
   }
 }
+
