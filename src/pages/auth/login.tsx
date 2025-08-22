@@ -16,7 +16,6 @@ export function Login({ onSuccess, onSwitchToSignup, onForgotPassword }: LoginPr
     })
     const [showPassword, setShowPassword] = useState(false)
 
-    // Use AuthContext instead of local state and AuthService
     const { login, loading, error, user, token } = useAuth()
 
     const handleInputChange = useCallback(
@@ -33,29 +32,19 @@ export function Login({ onSuccess, onSwitchToSignup, onForgotPassword }: LoginPr
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // Prevent multiple submissions
         if (loading) return
 
-        console.log("🔐 Attempting login for:", formData.email)
-
         try {
-            // Use AuthContext login method - this handles everything
+            
             await login(formData.email, formData.password)
-
-            console.log("✅ Login successful via AuthContext")
-
-            // Check if login was successful by checking if we have token and user
-            // Note: We need to check this after the state updates
         } catch (err) {
             console.error("❌ Login failed:", err)
-            // Error is already handled by AuthContext
         }
     }
 
     // Watch for successful login and call onSuccess
     useEffect(() => {
         if (token && user && !loading) {
-            console.log("🎉 Auth state updated, calling onSuccess")
             onSuccess(token, user)
         }
     }, [token, user, loading, onSuccess])

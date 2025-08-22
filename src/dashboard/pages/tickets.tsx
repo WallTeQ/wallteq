@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 import { useTickets } from "../../hook/useTicket"
 import {useEffect} from "react"
+import Loader from "../../components/Loader"
 
 interface Ticket {
     id: string
@@ -182,11 +183,7 @@ export default function TicketsPage() {
     }, [])
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
-            </div>
-        )
+        <Loader />
     }
 
     return (
@@ -234,7 +231,7 @@ export default function TicketsPage() {
             {/* Actions Bar */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-                    <div className="flex items-center space-x-4">
+                    <div className="flex flex-col md:flex-row items-center space-x-4">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                             <input
@@ -247,7 +244,7 @@ export default function TicketsPage() {
                         </div>
                         <button
                             onClick={() => setShowFilters(!showFilters)}
-                            className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                            className="w-full md:w-auto mt-3 md:mt-0 flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                         >
                             <Filter className="h-4 w-4" />
                             <span>Filters</span>
@@ -416,19 +413,19 @@ export default function TicketsPage() {
 
                 {/* Pagination */}
                 <div className="bg-white px-6 py-3 border-t border-gray-200 flex items-center justify-between">
-                    <div className="text-sm text-gray-700">
+                    <div className="text-xs text-gray-700">
                         Showing {filteredTickets.length} of {tickets.length} tickets
                     </div>
                     <div className="flex items-center space-x-2">
                         <button
-                            className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 disabled:opacity-50"
+                            className="px-3 py-1 border border-gray-300 rounded text-xs hover:bg-gray-50 disabled:opacity-50"
                             disabled
                         >
                             Previous
                         </button>
-                        <button className="px-3 py-1 bg-emerald-500 text-white rounded text-sm">1</button>
+                        <button className="px-3 py-1 bg-emerald-500 text-white rounded text-xs">1</button>
                         <button
-                            className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 disabled:opacity-50"
+                            className="px-3 py-1 border border-gray-300 rounded text-xs hover:bg-gray-50 disabled:opacity-50"
                             disabled
                         >
                             Next

@@ -3,20 +3,17 @@ import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import PublicRoutes from "./PublicRoutes";
 import { useAuth } from "../contexts/AuthContext";
 import ProtectedRoute from "./ProtectedRoutes";
+import Loader from "../components/Loader";
 
 const PageRoutes = () => {
-  const { token, user, loading } = useAuth(); // Add loading state from context
+  const { token, user, loading } = useAuth(); 
   const navigate = useNavigate();
   const location = useLocation();
 
-  console.log("PageRoutes - token:", token);
-  console.log("PageRoutes - role:", user?.role);
-  console.log("PageRoutes - loading:", loading);
 
   const systemUser = user?.role === "admin" || user?.role === "super-admin";
 
   useEffect(() => {
-    // Don't redirect while still loading auth state
     if (loading) return;
 
     // Only run if token and role are truthy and on auth pages
@@ -32,11 +29,7 @@ const PageRoutes = () => {
 
   // Show loading spinner while auth state is being determined
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-500"></div>
-      </div>
-    );
+<Loader />
   }
 
   return (

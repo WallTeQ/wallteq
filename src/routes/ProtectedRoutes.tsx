@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import AdminRoutes from "./AdminRoutes";
 import DashboardLayout from "../dashboard/layout/DashboardLayout";
 import InvalidRole from "../pages/InvalidRole";
+import Loader from "../components/Loader";
 
 const ProtectedRoute: React.FC = () => {
   const { token, user, loading } = useAuth();
@@ -11,16 +12,11 @@ const ProtectedRoute: React.FC = () => {
   console.log("ProtectedRoute token:", token);
   console.log("ProtectedRoute - role:", user?.role);
 
-  // Show loading while auth state is being determined
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-500"></div>
-      </div>
-    );
+    <Loader />
   }
 
-  // Redirect to auth if not authenticated
+  
   if (!token) {
     return <Navigate to="/auth" replace />;
   }

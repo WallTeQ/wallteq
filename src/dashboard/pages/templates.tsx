@@ -4,6 +4,7 @@ import { Search, Filter, Download, Plus, Edit, Trash2, Eye, Star, Package, Trend
 import { Link, useNavigate } from "react-router-dom"
 import { useTemplates } from "../../hook/useTemplate"
 import { useCategories } from "../../hook/useCategories"
+import Loader from "../../components/Loader"
 
 
 interface Template {
@@ -130,14 +131,7 @@ const TemplatesPage = () => {
     const statusCounts = getStatusCounts()
 
     if (loading && templates.length === 0) {
-        return (
-            <div className="space-y-6">
-                <div className="flex items-center justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
-                    <span className="ml-3 text-gray-600">Loading templates...</span>
-                </div>
-            </div>
-        )
+       <Loader />
     }
 
     if (error) {
