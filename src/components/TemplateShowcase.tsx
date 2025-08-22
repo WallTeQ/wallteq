@@ -6,6 +6,7 @@ import { Template } from "../types/template-type"
 import { useCart } from "../hook/useCart"
 import { useTemplates } from "../hook/useTemplate"
 import { useAuth } from "../contexts/AuthContext"
+import Loader from "./Loader"
 
 
 const TemplateShowcase = () => {
@@ -57,6 +58,9 @@ const TemplateShowcase = () => {
             <Star key={i} className={`h-4 w-4 ${i < rating ? "text-yellow-400 fill-current" : "text-gray-400"}`} />
         ))
     }
+    if (templatesLoading) {
+        <Loader />
+    }
 
     return (
         <section id="templates" className="py-20 bg-black">
@@ -70,8 +74,8 @@ const TemplateShowcase = () => {
 
                 <div className="grid lg:grid-cols-4 gap-8">
                     {/* Templates Grid */}
-                    <div className="lg:col-span-3">
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {templates.map((template, index) => (
                                 <AnimatedSection key={template.id} animation="fade-up" delay={index * 30}>
                                     <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group">

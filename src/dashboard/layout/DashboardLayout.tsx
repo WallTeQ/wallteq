@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import Header from "./Header"
 import { useAuth } from "../../contexts/AuthContext"
+import Loader from "../../components/Loader"
 
 const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -35,11 +36,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
   }, [user, navigate]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-500"></div>
-      </div>
-    )
+    <Loader/>
   }
 
   if (!isAuthenticated) {

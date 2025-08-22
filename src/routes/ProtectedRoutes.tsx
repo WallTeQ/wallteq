@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import AdminRoutes from "./AdminRoutes";
 import DashboardLayout from "../dashboard/layout/DashboardLayout";
 import InvalidRole from "../pages/InvalidRole";
+import Loader from "../components/Loader";
 
 const ProtectedRoute: React.FC = () => {
   const { token, user, loading } = useAuth();
@@ -12,11 +13,7 @@ const ProtectedRoute: React.FC = () => {
   console.log("ProtectedRoute - role:", user?.role);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-500"></div>
-      </div>
-    );
+    <Loader />
   }
 
   

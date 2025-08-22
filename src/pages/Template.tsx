@@ -6,6 +6,9 @@ import { useTickets } from "../hook/useTicket"
 import { Template } from "../types/template-type"
 import { useCategories } from "../hook/useCategories"
 import { useAuth } from "../contexts/AuthContext"
+import Loader from "../components/Loader"
+import {toast, ToastContainer} from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 const TemplatesPage = () => {
   const { templates, loading: templatesLoading, error: templatesError, fetchPublishedTemplates } = useTemplates()
@@ -32,8 +35,12 @@ const TemplatesPage = () => {
 
   const userId = user?.id || null
 
+  useEffect(() => {
+    fetchPublishedTemplates()
+  }, [])
+
   // Filter published templates only
-  const publishedTemplates = templates.filter((template) => template?.status === "published")
+  const publishedTemplates = templates
   const { categories: apiCategories, loading: categoriesLoading } = useCategories()
 
   // Apply filters
@@ -47,7 +54,9 @@ const TemplatesPage = () => {
 
   const handleAddToCart = async (templateId: string) => {
     if (!userId) {
-      alert("Please log in to add templates to cart")
+      toast.error("Please log in to add templates to cart", {
+        position: "top-right"
+      })
       return
     }
 
@@ -97,15 +106,13 @@ const TemplatesPage = () => {
     setSortBy("name")
   }
 
-  useEffect(() => {
-    fetchPublishedTemplates()
-  }, [])
+  
 
   if (templatesLoading && templates.length === 0) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+        <div className="flex flex-col items-center justify-center py-12">
+          <Loader />
           <span className="ml-3 text-gray-600">Loading templates...</span>
         </div>
       </div>

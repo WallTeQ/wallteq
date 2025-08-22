@@ -25,12 +25,14 @@ import { BrowserRouter, BrowserRouter as Router, useLocation } from "react-route
 import PageRoutes from './routes/index';
 import { useEffect } from "react";
 import { AuthProvider } from './contexts/AuthContext';
+import {ToastContainer} from "react-toastify"
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <PageRoutes />
+        <ToastContainer />
         {/* <About />
         <Services />
         <ValuesSection /> */}
