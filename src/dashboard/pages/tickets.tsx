@@ -11,62 +11,33 @@ import {
     Send,
     X,
     CheckCircle,
+    Eye,
 } from "lucide-react"
 import { useTickets } from "../../hook/useTicket"
 import {useEffect} from "react"
 import Loader from "../../components/Loader"
-
-interface Ticket {
-    id: string
-    ticketNumber: string
-    inquiry: string
-    status: "OPEN" | "IN_PROGRESS" | "CLOSED" | "FINALIZED"
-    adminResponse?: string
-    user: {
-        id: string
-        name: string
-        email: string
-    }
-    templates: Array<{
-        id: string
-        title: string
-        price: number
-        category?: {
-            id: string
-            name: string
-        }
-    }>
-    createdAt: string
-    updatedAt: string
-}
-
-const TicketStatus = {
-    OPEN: "OPEN",
-    IN_PROGRESS: "IN_PROGRESS",
-    CLOSED: "CLOSED",
-    FINALIZED: "FINALIZED",
-} as const
+import { toast } from "react-toastify"
+import {Ticket, TicketStatus} from "../../types/ticket-type"
+import { useNavigate } from "react-router-dom"
 
 const statusColors = {
-    OPEN: "bg-blue-100 text-blue-800",
-    IN_PROGRESS: "bg-yellow-100 text-yellow-800",
-    CLOSED: "bg-gray-100 text-gray-800",
-    FINALIZED: "bg-green-100 text-green-800",
+    [TicketStatus.OPEN]: "bg-blue-100 text-blue-800",
+    [TicketStatus.IN_PROGRESS]: "bg-yellow-100 text-yellow-800",
+    [TicketStatus.CLOSED]: "bg-gray-100 text-gray-800",
+    [TicketStatus.FINALIZED]: "bg-green-100 text-green-800",
 } as const
 
 export default function TicketsPage() {
-    const { tickets, loading, error, createTicket, respondToTicket, finalizeSale, getTicketStats } = useTickets()
+    const navigate = useNavigate()
+    const { tickets, loading, error, respondToTicket, finalizeSale, getTicketStats } = useTickets()
 
     const [searchTerm, setSearchTerm] = useState("")
     const [filterStatus, setFilterStatus] = useState<string>("all")
     const [selectedTickets, setSelectedTickets] = useState<string[]>([])
     const [showFilters, setShowFilters] = useState(false)
-    const [showCreateModal, setShowCreateModal] = useState(false)
     const [showResponseModal, setShowResponseModal] = useState(false)
     const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
-    const [newTicketInquiry, setNewTicketInquiry] = useState("")
     const [adminResponse, setAdminResponse] = useState("")
-    const [createSuccess, setCreateSuccess] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     // Memoize filtered tickets to prevent unnecessary recalculations
@@ -109,32 +80,16 @@ export default function TicketsPage() {
         )
     }, [])
 
-    const handleCreateTicket = useCallback(async () => {
-        if (!newTicketInquiry.trim()) {
-            alert("Please enter an inquiry")
-            return
-        }
-
-        setIsSubmitting(true)
-        try {
-            await createTicket({ inquiry: newTicketInquiry })
-            setCreateSuccess(true)
-            setNewTicketInquiry("")
-            setTimeout(() => {
-                setShowCreateModal(false)
-                setCreateSuccess(false)
-            }, 3000)
-        } catch (error) {
-            console.error("Failed to create ticket:", error)
-            alert("Failed to create ticket. Please try again.")
-        } finally {
-            setIsSubmitting(false)
-        }
-    }, [newTicketInquiry, createTicket])
+    const handleViewTemplates = useCallback(
+        (ticketId: string) => {
+            navigate(`/dashboard/tickets/${ticketId}/templates`)
+        },
+        [navigate],
+    )
 
     const handleRespondToTicket = useCallback(async () => {
         if (!adminResponse.trim() || !selectedTicket) {
-            alert("Please enter a response")
+            toast.error("Please enter a response")
             return
         }
 
@@ -144,9 +99,10 @@ export default function TicketsPage() {
             setShowResponseModal(false)
             setAdminResponse("")
             setSelectedTicket(null)
+            toast.success("Response sent successfully!")
         } catch (error) {
             console.error("Failed to respond to ticket:", error)
-            alert("Failed to respond to ticket. Please try again.")
+            toast.error("Failed to respond to ticket. Please try again.")
         } finally {
             setIsSubmitting(false)
         }
@@ -161,9 +117,10 @@ export default function TicketsPage() {
             setIsSubmitting(true)
             try {
                 await finalizeSale(ticketId)
+                toast.success("Sale finalized successfully!")
             } catch (error) {
                 console.error("Failed to finalize sale:", error)
-                alert("Failed to finalize sale. Please try again.")
+                toast.error("Failed to finalize sale. Please try again.")
             } finally {
                 setIsSubmitting(false)
             }
@@ -176,14 +133,8 @@ export default function TicketsPage() {
         setSearchTerm("")
     }, [])
 
-    // Only fetch tickets once on mount - removed fetchTickets from dependency array
-    useEffect(() => {
-        // The useTickets hook should handle initial data fetching
-        // No need to call fetchTickets here if the hook does it automatically
-    }, [])
-
     if (loading) {
-        <Loader />
+        return <Loader />
     }
 
     return (
@@ -248,20 +199,6 @@ export default function TicketsPage() {
                         >
                             <Filter className="h-4 w-4" />
                             <span>Filters</span>
-                        </button>
-                    </div>
-
-                    <div className="flex items-center space-x-3">
-                        <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                            <Download className="h-4 w-4" />
-                            <span>Export</span>
-                        </button>
-                        <button
-                            onClick={() => setShowCreateModal(true)}
-                            className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600"
-                        >
-                            <Plus className="h-4 w-4" />
-                            <span>New Ticket</span>
                         </button>
                     </div>
                 </div>
@@ -352,7 +289,12 @@ export default function TicketsPage() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="text-sm text-gray-900">
-                                            {ticket.templates.length} template(s)
+                                            <button
+                                                onClick={() => handleViewTemplates(ticket.id)}
+                                                className="text-blue-600 hover:text-blue-800 underline"
+                                            >
+                                                {ticket.templates.length} template(s)
+                                            </button>
                                             <div className="text-xs text-gray-500">
                                                 Total: ${ticket.templates.reduce((sum, t) => sum + t.price, 0)}
                                             </div>
@@ -374,12 +316,20 @@ export default function TicketsPage() {
                                     <td className="px-6 py-4">
                                         <div className="flex items-center space-x-2">
                                             <button
+                                                onClick={() => handleViewTemplates(ticket.id)}
+                                                className="p-1 text-gray-400 hover:text-purple-600 transition-colors"
+                                                title="View Templates"
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </button>
+                                            <button
                                                 onClick={() => {
                                                     setSelectedTicket(ticket)
                                                     setShowResponseModal(true)
                                                 }}
                                                 className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
                                                 disabled={isSubmitting}
+                                                title="Respond to Ticket"
                                             >
                                                 <MessageSquare className="h-4 w-4" />
                                             </button>
@@ -388,6 +338,7 @@ export default function TicketsPage() {
                                                     onClick={() => handleFinalizeSale(ticket.id)}
                                                     className="p-1 text-gray-400 hover:text-green-600 transition-colors"
                                                     disabled={isSubmitting}
+                                                    title="Finalize Sale"
                                                 >
                                                     <CheckCircle className="h-4 w-4" />
                                                 </button>
@@ -433,65 +384,6 @@ export default function TicketsPage() {
                     </div>
                 </div>
             </div>
-
-            {/* Create Ticket Modal */}
-            {showCreateModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg max-w-lg w-full">
-                        <div className="flex justify-between items-center p-6 border-b border-gray-200">
-                            <h2 className="text-xl font-semibold text-gray-900">Create New Ticket</h2>
-                            <button
-                                onClick={() => setShowCreateModal(false)}
-                                className="text-gray-400 hover:text-gray-600"
-                                disabled={isSubmitting}
-                            >
-                                <X className="h-6 w-6" />
-                            </button>
-                        </div>
-
-                        <div className="p-6">
-                            {createSuccess ? (
-                                <div className="text-center py-8">
-                                    <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Ticket Created Successfully!</h3>
-                                    <p className="text-gray-600">The ticket has been created and will use templates from your cart.</p>
-                                </div>
-                            ) : (
-                                <>
-                                    <div className="mb-6">
-                                        <label className="block text-gray-700 font-medium mb-2">Inquiry Description:</label>
-                                        <textarea
-                                            value={newTicketInquiry}
-                                            onChange={(e) => setNewTicketInquiry(e.target.value)}
-                                            placeholder="Describe your inquiry or customization requirements..."
-                                            className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                            disabled={isSubmitting}
-                                        />
-                                    </div>
-
-                                    <button
-                                        onClick={handleCreateTicket}
-                                        disabled={isSubmitting || !newTicketInquiry.trim()}
-                                        className="w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                    >
-                                        {isSubmitting ? (
-                                            <>
-                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                                Creating Ticket...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Send className="h-4 w-4" />
-                                                Create Ticket
-                                            </>
-                                        )}
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Response Modal */}
             {showResponseModal && selectedTicket && (
@@ -574,4 +466,5 @@ export default function TicketsPage() {
         </div>
     )
 }
+
 

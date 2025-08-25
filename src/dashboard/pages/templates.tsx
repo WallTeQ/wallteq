@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useTemplates } from "../../hook/useTemplate"
 import { useCategories } from "../../hook/useCategories"
 import Loader from "../../components/Loader"
+import { toast } from "react-toastify"
 
 
 interface Template {
@@ -83,12 +84,16 @@ const TemplatesPage = () => {
         try {
             const success = await publishTemplate(templateId)
             if (success) {
-                console.log("✅ Template published successfully")
+                toast.success("✅ Template published successfully", {
+                    position: "top-right",
+                })
                 // Refresh templates to get updated data
                 await fetchTemplates()
             }
         } catch (error) {
-            console.error("❌ Failed to publish template:", error)
+            toast.error("❌ Failed to publish template", {
+                position: "top-right",
+            })
         } finally {
             setPublishingTemplates((prev) => {
                 const newSet = new Set(prev)
@@ -103,7 +108,9 @@ const TemplatesPage = () => {
         if (window.confirm("Are you sure you want to delete this template? This action cannot be undone.")) {
             const success = await deleteTemplate(templateId)
             if (success) {
-                console.log("✅ Template deleted successfully")
+                toast.success("✅ Template deleted successfully", {
+                    position: "top-right",
+                })
                 // Remove from selected templates if it was selected
                 setSelectedTemplates((prev) => prev.filter((id) => id !== templateId))
             }
@@ -281,7 +288,7 @@ const TemplatesPage = () => {
             </div>
 
             {/* Templates Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 {filteredTemplates.map((template) => (
                         <div
                             key={template.id}

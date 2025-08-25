@@ -70,12 +70,12 @@ export function Sidebar({ onLogout }: SidebarProps) {
             href: "/dashboard/tickets",
             badge: ticketsLoading ? "..." : ticketCount.toString(),
         },
-        {
-            title: "Orders",
-            icon: CreditCard,
-            href: "/dashboard/orders",
-            badge: "8",
-        },
+        // {
+        //     title: "Orders",
+        //     icon: CreditCard,
+        //     href: "/dashboard/orders",
+        //     badge: "8",
+        // },
         // {
         //     title: "Reports",
         //     icon: BarChart3,

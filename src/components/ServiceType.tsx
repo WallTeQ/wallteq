@@ -128,7 +128,7 @@ const ServiceType = () => {
         <section id="templates" className="py-20 bg-black">
             <div className="container mx-auto px-4">
                 <AnimatedSection animation="fade-up" className="text-center mb-16">
-                    <h2 className="text-4xl font-bold text-white mb-6">Industries We Build For</h2>
+                    <h2 className="text-2xl md:text-4xl font-bold text-white mb-6">Industries We Build For</h2>
                     <p className="text-xl text-gray-400 max-w-3xl mx-auto">
                         From healthcare to e-commerce, education to finance, we design and develop custom web and mobile apps that drive success across every sector.
                     </p>

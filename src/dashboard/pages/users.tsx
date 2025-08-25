@@ -219,7 +219,7 @@ export default function UsersPage() {
                             className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600"
                         >
                             <Plus className="h-4 w-4" />
-                            <span>Add User</span>
+                            <span className="text-sm md:text-base whitespace-nowrap">Add User</span>
                         </button>
                     </div>
                 </div>
