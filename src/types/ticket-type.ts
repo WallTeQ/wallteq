@@ -21,17 +21,28 @@ export interface User {
 }
 
 export interface Ticket {
-  id: string;
-  ticketNumber: string;
-  user: User;
-  templates: Template[];
-  inquiry: string;
-  adminResponse?: string;
-  status: TicketStatus;
-  createdAt: string;
-  updatedAt: string;
+    id: string
+    ticketNumber: string
+    inquiry: string
+    status: TicketStatus
+    adminResponse?: string
+    user: {
+        id: string
+        name: string
+        email: string
+    }
+    templates: Array<{
+        id: string
+        title: string
+        price: number
+        category?: {
+            id: string
+            name: string
+        }
+    }>
+    createdAt: string
+    updatedAt: string
 }
-
 export interface CreateTicketData {
   templateIds?: string[];
   inquiry: string;

@@ -167,13 +167,35 @@ const NavBar = () => {
                 )}
               </div>
             ))}
-            {/* login button */}
-            <Link
-              to="/auth"
-              className="inline-flex bg-blue-800 items-center gap-3 text-white px-5 py-1 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group "
-            >
-              <span>Login</span>
-            </Link>
+            {user && (user.role === "admin" || user.role === "super-admin") && (
+              <Link
+                to="/dashboard"
+                className={`flex items-center space-x-1 py-2 text-sm font-medium transition-colors ${
+                  activeLink === "Dashboard"
+                    ? "text-blue-600"
+                    : "text-gray-700 hover:text-blue-600"
+                }`}
+                onClick={() => handleLinkClick("Dashboard", "/dashboard")}
+              >
+                <span>Dashboard</span>
+              </Link>
+            )}
+            {/* login or logout button based on user state */}
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="inline-flex bg-blue-800 items-center gap-3 text-white px-5 py-1 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group "
+              >
+                <span>Logout</span>
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="inline-flex bg-blue-800 items-center gap-3 text-white px-5 py-1 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group "
+              >
+                <span>Login</span>
+              </Link>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}

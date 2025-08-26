@@ -26,11 +26,13 @@ import PageRoutes from './routes/index';
 import { useEffect } from "react";
 import { AuthProvider } from './contexts/AuthContext';
 import {ToastContainer} from "react-toastify"
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <PageRoutes />
         <ToastContainer />
         {/* <About />
