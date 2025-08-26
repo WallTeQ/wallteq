@@ -1,6 +1,4 @@
-"use client"
-
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { SignupInitiate } from "./SignUp"
 import { SignupOTP } from "./Otp"
 import { SignupComplete } from "./SignupComplete"
@@ -20,51 +18,62 @@ export function AuthContainer({ onAuthSuccess }: AuthContainerProps) {
 
     console.log("🔄 Current auth step:", currentStep, "Email:", email)
 
-    const handleSignupInitiated = (userEmail: string) => {
+    const handleSignupInitiated = useCallback((userEmail: string) => {
         console.log("📧 Signup initiated for:", userEmail)
         setEmail(userEmail)
         setCurrentStep("signup-otp")
-    }
+    }, [])
 
-    const handleOTPVerified = () => {
+    const handleOTPVerified = useCallback(() => {
         console.log("✅ OTP verified, moving to complete signup")
         setCurrentStep("signup-complete")
-    }
+    }, [])
 
-    const handleSignupCompleted = (token: string, user: any) => {
-        console.log("🎉 Signup completed successfully")
-        onAuthSuccess(token, user)
-    }
+    const handleSignupCompleted = useCallback(
+        (token: string, user: any) => {
+            console.log("🎉 Signup completed successfully")
+            onAuthSuccess(token, user)
+        },
+        [onAuthSuccess],
+    )
 
-    const handleLoginSuccess = (token: string, user: any) => {
-        console.log("🎉 Login successful")
-        onAuthSuccess(token, user)
-    }
+    const handleLoginSuccess = useCallback(
+        (token: string, user: any) => {
+            console.log("🎉 Login successful")
+            onAuthSuccess(token, user)
+        },
+        [onAuthSuccess],
+    )
 
-    const handleForgotPasswordInitiated = (userEmail: string) => {
+    const handleForgotPasswordInitiated = useCallback((userEmail: string) => {
         console.log("🔄 Password reset initiated for:", userEmail)
         setEmail(userEmail)
         setCurrentStep("reset-password")
-    }
+    }, [])
 
-    const handlePasswordResetSuccess = () => {
+    const handlePasswordResetSuccess = useCallback(() => {
         console.log("✅ Password reset successful, returning to login")
         setCurrentStep("login")
         setEmail("")
-    }
+    }, [])
 
-    const resetToLogin = () => {
+    const resetToLogin = useCallback(() => {
         console.log("🔙 Returning to login")
         setCurrentStep("login")
         setEmail("")
-    }
+    }, [])
+
+    const switchToLogin = useCallback(() => setCurrentStep("login"), [])
+    const switchToSignup = useCallback(() => setCurrentStep("signup-initiate"), [])
+    const switchToForgotPassword = useCallback(() => setCurrentStep("forgot-password"), [])
+    const backToSignupInitiate = useCallback(() => setCurrentStep("signup-initiate"), [])
 
     switch (currentStep) {
         case "signup-initiate":
-            return <SignupInitiate onSuccess={handleSignupInitiated} onSwitchToLogin={() => setCurrentStep("login")} />
+            return <SignupInitiate onSuccess={handleSignupInitiated} onSwitchToLogin={switchToLogin} />
 
         case "signup-otp":
-            return <SignupOTP email={email} onSuccess={handleOTPVerified} onBack={() => setCurrentStep("signup-initiate")} />
+            return <SignupOTP email={email} onSuccess={handleOTPVerified} onBack={backToSignupInitiate} />
 
         case "signup-complete":
             return <SignupComplete email={email} onSuccess={handleSignupCompleted} />
@@ -79,8 +88,8 @@ export function AuthContainer({ onAuthSuccess }: AuthContainerProps) {
             return (
                 <Login
                     onSuccess={handleLoginSuccess}
-                    onSwitchToSignup={() => setCurrentStep("signup-initiate")}
-                    onForgotPassword={() => setCurrentStep("forgot-password")}
+                    onSwitchToSignup={switchToSignup}
+                    onForgotPassword={switchToForgotPassword}
                 />
             )
     }

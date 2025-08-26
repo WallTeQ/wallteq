@@ -12,6 +12,7 @@ import TemplatesPage from '../dashboard/pages/templates';
 import OrdersPage from '../dashboard/pages/orders';
 import TicketsPage from '../dashboard/pages/tickets';
 import AddTemplatePage from '../dashboard/pages/add-template';
+import TicketTemplatesPage from '../dashboard/pages/tickets-template';
 const AdminRoutes = () => (
   console.log("AdminRoutes - rendering"),
   <Routes>
@@ -21,6 +22,7 @@ const AdminRoutes = () => (
     <Route path="/templates" element={<TemplatesPage />} />
     <Route path="/templates/add" element={<AddTemplatePage />} />
     <Route path="/tickets" element={<TicketsPage />} />
+    <Route path="/tickets/:ticketId/templates" element={<TicketTemplatesPage />} />
     <Route path="/carts" element={<Carts />} />
     <Route path="/orders" element={<OrdersPage />} />
     <Route path="*" element={<NotFound />} />

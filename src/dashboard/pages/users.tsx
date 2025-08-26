@@ -43,9 +43,9 @@ export default function UsersPage() {
         status: user.suspended ? "suspended" : "active",
         joinDate: user.createdAt,
         lastLogin: user.updatedAt,
-        totalOrders: 0, // These would come from order data
+        totalOrders: 0, 
         totalSpent: 0,
-        phone: undefined, // Not in backend model
+        phone: undefined, 
     })
 
     const filteredUsers = users.map(formatUserForDisplay).filter((user) => {
@@ -186,7 +186,7 @@ export default function UsersPage() {
             {/* Actions Bar */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-                    <div className="flex items-center space-x-4">
+                    <div className="flex flex-col md:flex-row items-center space-x-4">
                         {/* Search */}
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -202,7 +202,7 @@ export default function UsersPage() {
                         {/* Filters */}
                         <button
                             onClick={() => setShowFilters(!showFilters)}
-                            className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                            className="w-full md:w-auto mt-3 md:mt-0 flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                         >
                             <Filter className="h-4 w-4" />
                             <span>Filters</span>
@@ -219,7 +219,7 @@ export default function UsersPage() {
                             className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600"
                         >
                             <Plus className="h-4 w-4" />
-                            <span>Add User</span>
+                            <span className="text-sm md:text-base whitespace-nowrap">Add User</span>
                         </button>
                     </div>
                 </div>
@@ -396,14 +396,14 @@ export default function UsersPage() {
 
                 {/* Pagination */}
                 <div className="bg-white px-6 py-3 border-t border-gray-200 flex items-center justify-between">
-                    <div className="text-sm text-gray-700">
+                    <div className="text-xs text-gray-700">
                         Showing {filteredUsers.length} of {users.length} users
                     </div>
                     <div className="flex items-center space-x-2">
-                        <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Previous</button>
-                        <button className="px-3 py-1 bg-emerald-500 text-white rounded text-sm">1</button>
-                        <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">2</button>
-                        <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Next</button>
+                        <button className="px-3 py-1 border border-gray-300 rounded text-xs hover:bg-gray-50">Previous</button>
+                        <button className="px-3 py-1 bg-emerald-500 text-white rounded text-xs">1</button>
+                        <button className="px-3 py-1 border border-gray-300 rounded text-xs hover:bg-gray-50">2</button>
+                        <button className="px-3 py-1 border border-gray-300 rounded text-xs hover:bg-gray-50">Next</button>
                     </div>
                 </div>
             </div>

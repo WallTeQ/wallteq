@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 const NavBar = () => {
   const [activeLink, setActiveLink] = useState("Home");
@@ -7,6 +8,12 @@ const NavBar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [openSubItems, setOpenSubItems] = useState(null);
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -160,13 +167,35 @@ const NavBar = () => {
                 )}
               </div>
             ))}
-            {/* login button */}
-            <Link
-              to="/auth"
-              className="inline-flex bg-blue-800 items-center gap-3 text-white px-5 py-1 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group "
-            >
-              <span>Login</span>
-            </Link>
+            {user && (user.role === "admin" || user.role === "super-admin") && (
+              <Link
+                to="/dashboard"
+                className={`flex items-center space-x-1 py-2 text-sm font-medium transition-colors ${
+                  activeLink === "Dashboard"
+                    ? "text-blue-600"
+                    : "text-gray-700 hover:text-blue-600"
+                }`}
+                onClick={() => handleLinkClick("Dashboard", "/dashboard")}
+              >
+                <span>Dashboard</span>
+              </Link>
+            )}
+            {/* login or logout button based on user state */}
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="inline-flex bg-blue-800 items-center gap-3 text-white px-5 py-1 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group "
+              >
+                <span>Logout</span>
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="inline-flex bg-blue-800 items-center gap-3 text-white px-5 py-1 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group "
+              >
+                <span>Login</span>
+              </Link>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -266,12 +295,21 @@ const NavBar = () => {
               )}
             </div>
           ))}
-          <Link
-            to="/auth"
-            className="inline-flex bg-blue-800 items-center gap-3 text-white px-5 py-1 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group "
-          >
-            <span>Login</span>
-          </Link>
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="inline-flex bg-blue-800 items-center gap-3 text-white px-5 py-1 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group "
+            >
+              <span>Logout</span>
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              className="inline-flex bg-blue-800 items-center gap-3 text-white px-5 py-1 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 group "
+            >
+              <span>Login</span>
+            </Link>
+          )}
         </div>
       </div>
     </header>

@@ -19,7 +19,8 @@ import {
 import { Link } from "react-router-dom"
 import { useLocation } from "react-router-dom"
 import { useUsers } from "../../hook/useUser"
-
+import { useTemplates } from "../../hook/useTemplate"
+import {useTickets} from "../../hook/useTicket"
 interface SidebarProps {
     onLogout: () => void
 }
@@ -31,7 +32,11 @@ export function Sidebar({ onLogout }: SidebarProps) {
 
     // Get user data from the hook
     const { users, loading: usersLoading } = useUsers()
+    const { templates, loading: templatesLoading } = useTemplates()
+    const { tickets, loading: ticketsLoading } = useTickets()
     const userCount = users.length
+    const templateCount = templates.length
+    const ticketCount = tickets.length
 
     // Define menu items inside component to access userCount
     const menuItems = [
@@ -57,36 +62,24 @@ export function Sidebar({ onLogout }: SidebarProps) {
             title: "Templates",
             icon: Package,
             href: "/dashboard/templates",
-            badge: "45",
-        },
-        {
-            title: "Carts",
-            icon: ShoppingCart,
-            href: "/dashboard/carts",
-            badge: "23",
+            badge: templatesLoading ? "..." : templateCount.toString(),
         },
         {
             title: "Tickets",
             icon: Ticket,
             href: "/dashboard/tickets",
-            badge: "12",
+            badge: ticketsLoading ? "..." : ticketCount.toString(),
         },
-        {
-            title: "Orders",
-            icon: CreditCard,
-            href: "/dashboard/orders",
-            badge: "8",
-        },
+        // {
+        //     title: "Orders",
+        //     icon: CreditCard,
+        //     href: "/dashboard/orders",
+        //     badge: "8",
+        // },
         // {
         //     title: "Reports",
         //     icon: BarChart3,
         //     href: "/dashboard/reports",
-        //     badge: null,
-        // },
-        // {
-        //     title: "Content",
-        //     icon: FileText,
-        //     href: "/dashboard/content",
         //     badge: null,
         // },
         // {
@@ -116,16 +109,16 @@ export function Sidebar({ onLogout }: SidebarProps) {
     return (
         <div
             className={`bg-gray-900 border-r border-gray-800 transition-all duration-300 ${isCollapsed ? "w-16" : "w-64"
-                } flex flex-col h-screen`}
+                } flex flex-col h-max-screen`}
         >
             {/* Header */}
             <div className="p-4 border-b border-gray-800">
                 <div className="flex items-center justify-between">
                     {!isCollapsed && (
-                        <div className="flex items-center space-x-2">
-                            <Globe className="h-8 w-8 text-emerald-400" />
+                        <Link to="/" className="flex items-center space-x-2">
+                            <img src="/logo.png" alt="" className="h-8 w-8" />
                             <span className="text-xl font-bold text-white">Wall-Teq</span>
-                        </div>
+                        </Link>
                     )}
                     <button
                         onClick={() => setIsCollapsed(!isCollapsed)}

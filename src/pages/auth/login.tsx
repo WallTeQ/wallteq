@@ -1,7 +1,7 @@
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react"
-import { AuthService } from "../../services/AuthService"
+import { useAuth } from "../../contexts/AuthContext"
 
 interface LoginProps {
     onSuccess: (token: string, user: any) => void
@@ -15,57 +15,39 @@ export function Login({ onSuccess, onSwitchToSignup, onForgotPassword }: LoginPr
         password: "",
     })
     const [showPassword, setShowPassword] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState("")
-    const [rememberMe, setRememberMe] = useState(false)
 
-    const authService = new AuthService()
+    const { login, loading, error, user, token } = useAuth()
 
-    useEffect(() => {
-        console.log("🔧 Environment check:", {
-            VITE_SERVER_URL: import.meta.env?.VITE_SERVER_URL,
-            NODE_ENV: import.meta.env?.NODE_ENV,
-            MODE: import.meta.env?.MODE,
-        })
+    const handleInputChange = useCallback(
+        (field: string, value: string) => {
+            setFormData((prev) => ({ ...prev, [field]: value }))
+        },
+        []
+    )
+
+    const togglePasswordVisibility = useCallback(() => {
+        setShowPassword((prev) => !prev)
     }, [])
-
-    const handleInputChange = (field: string, value: string) => {
-        setFormData((prev) => ({ ...prev, [field]: value }))
-        // Clear error when user starts typing
-        if (error) setError("")
-    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsLoading(true)
-        setError("")
 
-        console.log("🔐 Attempting login for:", formData.email)
+        if (loading) return
 
         try {
-            const response = await authService.login({
-                email: formData.email,
-                password: formData.password,
-            })
-
-            console.log("✅ Login successful:", response)
-
-            // Store token
-            if (response.token) {
-                if (rememberMe) {
-                    localStorage.setItem("token", response.token)
-                } else {
-                    sessionStorage.setItem("token", response.token)
-                }
-                onSuccess(response.token, response.user)
-            }
-        } catch (error: any) {
-            console.error("❌ Login failed:", error)
-            setError(error.message || error.error || "Login failed. Please try again.")
-        } finally {
-            setIsLoading(false)
+            
+            await login(formData.email, formData.password)
+        } catch (err) {
+            console.error("❌ Login failed:", err)
         }
     }
+
+    // Watch for successful login and call onSuccess
+    useEffect(() => {
+        if (token && user && !loading) {
+            onSuccess(token, user)
+        }
+    }, [token, user, loading, onSuccess])
 
     return (
         <div className="min-h-screen bg-black flex items-center justify-center px-4 mt-12">
@@ -92,7 +74,7 @@ export function Login({ onSuccess, onSwitchToSignup, onForgotPassword }: LoginPr
                                     required
                                     className="w-full bg-gray-800 border border-gray-700 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
                                     placeholder="Enter your email"
-                                    disabled={isLoading}
+                                    disabled={loading}
                                 />
                             </div>
                         </div>
@@ -112,12 +94,13 @@ export function Login({ onSuccess, onSwitchToSignup, onForgotPassword }: LoginPr
                                     required
                                     className="w-full bg-gray-800 border border-gray-700 text-white pl-10 pr-12 py-3 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
                                     placeholder="Enter your password"
-                                    disabled={isLoading}
+                                    disabled={loading}
                                 />
                                 <button
                                     type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-black"
+                                    onClick={togglePasswordVisibility}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                                    disabled={loading}
                                 >
                                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                                 </button>
@@ -129,9 +112,8 @@ export function Login({ onSuccess, onSwitchToSignup, onForgotPassword }: LoginPr
                             <label className="flex items-center">
                                 <input
                                     type="checkbox"
-                                    checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
                                     className="w-4 h-4 text-blue-500 bg-gray-800 border-gray-600 rounded focus:ring-blue-400 focus:ring-2"
+                                    disabled={loading}
                                 />
                                 <span className="ml-2 text-sm text-gray-400">Remember me</span>
                             </label>
@@ -139,6 +121,7 @@ export function Login({ onSuccess, onSwitchToSignup, onForgotPassword }: LoginPr
                                 type="button"
                                 onClick={onForgotPassword}
                                 className="text-sm text-blue-400 hover:text-blue-300"
+                                disabled={loading}
                             >
                                 Forgot password?
                             </button>
@@ -152,10 +135,10 @@ export function Login({ onSuccess, onSwitchToSignup, onForgotPassword }: LoginPr
 
                         <button
                             type="submit"
-                            disabled={isLoading || !formData.email || !formData.password}
+                            disabled={loading || !formData.email || !formData.password}
                             className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white disabled:text-gray-400 py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center"
                         >
-                            {isLoading ? (
+                            {loading ? (
                                 <>
                                     <Loader2 className="animate-spin h-5 w-5 mr-2" />
                                     Signing In...
@@ -172,7 +155,11 @@ export function Login({ onSuccess, onSwitchToSignup, onForgotPassword }: LoginPr
                     <div className="mt-6 text-center">
                         <p className="text-gray-400 text-sm">
                             Don't have an account?{" "}
-                            <button onClick={onSwitchToSignup} className="text-blue-400 hover:text-blue-300 font-medium">
+                            <button
+                                onClick={onSwitchToSignup}
+                                className="text-blue-400 hover:text-blue-300 font-medium"
+                                disabled={loading}
+                            >
                                 Create account
                             </button>
                         </p>
