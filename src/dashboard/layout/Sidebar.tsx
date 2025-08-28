@@ -47,12 +47,6 @@ export function Sidebar({ onLogout }: SidebarProps) {
             badge: null,
         },
         {
-            title: "Analytics",
-            icon: TrendingUp,
-            href: "/dashboard/analytics",
-            badge: null,
-        },
-        {
             title: "Users",
             icon: Users,
             href: "/dashboard/users",
