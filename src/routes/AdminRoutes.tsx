@@ -13,10 +13,11 @@ import OrdersPage from '../dashboard/pages/orders';
 import TicketsPage from '../dashboard/pages/tickets';
 import AddTemplatePage from '../dashboard/pages/add-template';
 import TicketTemplatesPage from '../dashboard/pages/tickets-template';
+import AnalyticsPage from '../dashboard/pages/analytics';
 const AdminRoutes = () => (
   console.log("AdminRoutes - rendering"),
   <Routes>
-    <Route path="/" element={<Dashboard />} />
+    <Route path="/" element={<AnalyticsPage />} />
     <Route path="/users" element={<UsersPage />} />
     <Route path="/categories" element={<CategoryPage />} />
     <Route path="/templates" element={<TemplatesPage />} />

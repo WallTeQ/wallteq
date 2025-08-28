@@ -47,7 +47,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
     <div className="min-h-screen bg-gray-100 flex">
       <Sidebar onLogout={handleLogout} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header title="Dashboard" subtitle="Welcome to your dashboard" />
+        <Header title="Dashboard" subtitle="Welcome to wallteq dashboard" />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>
