@@ -46,3 +46,21 @@ export interface UpdateTemplateData {
   price?: number;
   demoUrl?: string;
 }
+
+export interface TemplateFormData {
+  title: string;
+  description: string;
+  categoryId: string;
+  price: number;
+  demoUrl: string;
+}
+export interface ImageUploadProgress {
+  [key: string]: number;
+}
+
+export interface StatusCounts {
+  total: number;
+  published: number;
+  pending: number;
+  rejected: number;
+}

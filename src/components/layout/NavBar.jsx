@@ -295,6 +295,19 @@ const NavBar = () => {
               )}
             </div>
           ))}
+          {user && (user.role === "admin" || user.role === "super-admin") && (
+            <Link
+              to="/dashboard"
+              className={`flex items-center space-x-1 py-2 text-sm font-medium transition-colors ${
+                activeLink === "Dashboard"
+                  ? "text-blue-600"
+                  : "text-gray-700 hover:text-blue-600"
+              }`}
+              onClick={() => handleLinkClick("Dashboard", "/dashboard")}
+            >
+              <span>Dashboard</span>
+            </Link>
+          )}
           {user ? (
             <button
               onClick={handleLogout}

@@ -23,10 +23,11 @@ import { useTemplates } from "../../hook/useTemplate"
 import {useTickets} from "../../hook/useTicket"
 interface SidebarProps {
     onLogout: () => void
+    isCollapsed: boolean
+    setIsCollapsed: (collapsed: boolean) => void
 }
 
-export function Sidebar({ onLogout }: SidebarProps) {
-    const [isCollapsed, setIsCollapsed] = useState(false)
+export function Sidebar({ onLogout, isCollapsed, setIsCollapsed }: SidebarProps) {
     const [userInfo, setUserInfo] = useState({ name: "Admin User", email: "admin@wall-teq.com" })
     const location = useLocation()
 
@@ -101,9 +102,9 @@ export function Sidebar({ onLogout }: SidebarProps) {
     }, [])
 
     return (
-        <div
-            className={`bg-gray-900 border-r border-gray-800 transition-all duration-300 ${isCollapsed ? "w-16" : "w-64"
-                } flex flex-col h-max-screen`}
+        <aside
+            className={`fixed top-0 left-0 z-40 ${isCollapsed ? "w-16" : "w-64"} h-screen bg-gray-900 border-r border-gray-800 transition-all duration-300 flex flex-col`}
+            aria-label="Sidebar"
         >
             {/* Header */}
             <div className="p-4 border-b border-gray-800">
@@ -124,7 +125,7 @@ export function Sidebar({ onLogout }: SidebarProps) {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 p-4 space-y-2">
+            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
                 {menuItems.map((item) => {
                     const Icon = item.icon
                     const isActive = location.pathname === item.href
@@ -152,8 +153,8 @@ export function Sidebar({ onLogout }: SidebarProps) {
                 })}
             </nav>
 
-            {/* User Profile & Logout */}
-            <div className="p-4 border-t border-gray-800">
+            {/* User Profile & Logout - stick to bottom */}
+            <div className="p-4 border-t border-gray-800 mt-auto">
                 <div className="flex items-center space-x-3 mb-3">
                     <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
                         <UserCheck className="h-4 w-4 text-black" />
@@ -174,6 +175,6 @@ export function Sidebar({ onLogout }: SidebarProps) {
                     {!isCollapsed && <span>Logout</span>}
                 </button>
             </div>
-        </div>
+        </aside>
     )
 }

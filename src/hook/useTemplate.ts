@@ -14,9 +14,7 @@ export const useTemplates = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log("🔄 Fetching templates...");
       const response = await api.get("/api/templates");
-      console.log("✅ Templates fetched:", response);
 
       // Handle different response formats
       const templatesData = response.data || response.templates || response;
@@ -50,7 +48,6 @@ export const useTemplates = () => {
     setError(null);
     try {
       const response = await api.get(`/api/templates/${id}`);
-      console.log('templates', response);
       return response.data || response.template || response;
     } catch (err: any) {
       setError(err.message || "Failed to fetch template");
@@ -67,16 +64,13 @@ export const useTemplates = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log("🔄 Creating template with data:", data);
 
       const response = await api.post("/api/templates", data);
-      console.log("✅ Template creation response:", response);
 
       const newTemplate = response.template || response.data || response;
 
       if (newTemplate && newTemplate.id) {
         setTemplates((prev) => [newTemplate, ...prev]);
-        console.log("✅ Template created successfully:", newTemplate);
         return newTemplate;
       } else {
         throw new Error("No template data returned from server");
@@ -147,9 +141,7 @@ export const useTemplates = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log("🔄 Publishing template:", id);
       const response = await api.post(`/api/templates/${id}/publish`, {});
-      console.log("✅ Publish response:", response);
 
       const updatedTemplate = response.template || response.data || response;
       if (updatedTemplate) {
@@ -199,17 +191,13 @@ export const useTemplates = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log(
-        `🔄 Uploading ${type} for template ${templateId}:`,
-        file.name
-      );
+
 
       // Create FormData exactly as backend expects
       const formData = new FormData();
       formData.append("media", file);
       formData.append("type", type);
 
-      console.log("📤 FormData contents:");
       for (const [key, value] of formData.entries()) {
         console.log(`  ${key}:`, value);
       }
@@ -218,7 +206,6 @@ export const useTemplates = () => {
         `/api/templates/${templateId}/media`,
         formData
       );
-      console.log("✅ Media upload response:", response);
 
       if (response.success && response.data) {
         return response.data;
