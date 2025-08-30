@@ -14,7 +14,6 @@ import {
     Eye,
 } from "lucide-react"
 import { useTickets } from "../../hook/useTicket"
-import {useEffect} from "react"
 import Loader from "../../components/Loader"
 import { toast } from "react-toastify"
 import {Ticket, TicketStatus} from "../../types/ticket-type"
